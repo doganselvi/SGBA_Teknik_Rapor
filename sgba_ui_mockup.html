@@ -1,0 +1,346 @@
+
+<style>
+  .phone-wrap {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 1.5rem 0;
+  }
+  .phone {
+    width: 200px;
+    background: #0a0a0a;
+    border-radius: 36px;
+    padding: 14px 10px;
+    border: 2px solid #333;
+    box-shadow: 0 0 0 1px #1a1a1a;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .phone-notch {
+    width: 60px;
+    height: 10px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    margin: 0 auto 10px;
+  }
+  .screen {
+    background: #1c1c2e;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+  .screen-label {
+    text-align: center;
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    margin-top: 8px;
+    font-weight: 500;
+  }
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 12px 4px;
+    font-size: 9px;
+    color: rgba(255,255,255,0.7);
+  }
+  .home-screen {
+    padding: 8px;
+    min-height: 310px;
+  }
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding: 4px 0;
+  }
+  .app-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin: 0 auto;
+  }
+  .app-name {
+    font-size: 7px;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    margin-top: 2px;
+  }
+  .gesture-canvas {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+  }
+  .settings-screen {
+    min-height: 310px;
+    padding: 0;
+  }
+  .settings-header {
+    background: #1a1a2e;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.1);
+  }
+  .settings-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #fff;
+  }
+  .settings-subtitle {
+    font-size: 9px;
+    color: rgba(255,255,255,0.5);
+  }
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  }
+  .settings-row-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+  }
+  .settings-row-sub {
+    font-size: 8px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 1px;
+  }
+  .toggle {
+    width: 26px;
+    height: 14px;
+    border-radius: 7px;
+    background: #1DB873;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    right: 2px;
+  }
+  .toggle.off {
+    background: rgba(255,255,255,0.2);
+  }
+  .toggle.off::after {
+    right: auto;
+    left: 2px;
+  }
+  .chevron {
+    width: 6px;
+    height: 6px;
+    border-right: 1px solid rgba(255,255,255,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    transform: rotate(-45deg);
+    flex-shrink: 0;
+  }
+  .section-header-row {
+    padding: 8px 12px 4px;
+    font-size: 8px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .success-screen {
+    min-height: 310px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    gap: 6px;
+  }
+  .success-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(29,184,115,0.2);
+    border: 1px solid rgba(29,184,115,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .app-row {
+    display: flex;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+  .secret-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .secret-app-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .secret-app-name {
+    font-size: 7px;
+    color: rgba(255,255,255,0.7);
+  }
+  .hidden-badge {
+    font-size: 7px;
+    background: rgba(29,184,115,0.2);
+    color: #1DB873;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 0.5px solid rgba(29,184,115,0.3);
+    margin-top: 2px;
+    text-align: center;
+  }
+</style>
+
+<div class="phone-wrap">
+
+  <!-- EKRAN 1: Normal Ana Ekran -->
+  <div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="screen">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>●●● 5G 🔋</span>
+        </div>
+        <div class="home-screen" style="position:relative">
+          <div class="app-grid">
+            <div><div class="app-icon" style="background:#1a73e8">📞</div><div class="app-name">Telefon</div></div>
+            <div><div class="app-icon" style="background:#34a853">💬</div><div class="app-name">Mesaj</div></div>
+            <div><div class="app-icon" style="background:#ea4335">📷</div><div class="app-name">Kamera</div></div>
+            <div><div class="app-icon" style="background:#fbbc04">🎵</div><div class="app-name">Müzik</div></div>
+            <div><div class="app-icon" style="background:#9c27b0">📸</div><div class="app-name">Galeri</div></div>
+            <div><div class="app-icon" style="background:#ff5722">🌐</div><div class="app-name">Chrome</div></div>
+            <div><div class="app-icon" style="background:#009688">⚙️</div><div class="app-name">Ayarlar</div></div>
+            <div><div class="app-icon" style="background:#607d8b">🗺️</div><div class="app-name">Harita</div></div>
+          </div>
+          <div style="margin-top:8px;padding:6px;background:rgba(255,255,255,0.05);border-radius:12px">
+            <div style="font-size:8px;color:rgba(255,255,255,0.4);text-align:center">Güvenli Klasör yok · Gizli simge yok</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.6);text-align:center;margin-top:2px">Normal ana ekran görünümü</div>
+          </div>
+          <!-- Gesture çizimi animasyonu -->
+          <svg class="gesture-canvas" viewBox="0 0 180 200" style="opacity:0.15">
+            <path d="M90 60 L130 100 L90 140 L50 100 Z" fill="none" stroke="#1DB873" stroke-width="1.5" stroke-dasharray="4 2">
+              <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">1 · Normal ekran görünümü</div>
+  </div>
+
+  <!-- EKRAN 2: Ayarlar Menüsü -->
+  <div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="screen">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>●●● 5G 🔋</span>
+        </div>
+        <div class="settings-screen">
+          <div class="settings-header">
+            <div style="font-size:14px">←</div>
+            <div>
+              <div class="settings-title">Görünmez Erişim</div>
+              <div class="settings-subtitle">Ayarlar → Güvenlik → Görünmez Erişim</div>
+            </div>
+          </div>
+          <div class="section-header-row">Gesture Kilidi</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">SGBA Aktif</div>
+              <div class="settings-row-sub">Görünmez gesture kilidi</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Gesture Kaydet</div>
+              <div class="settings-row-sub">3 tekrar ile öğret</div>
+            </div>
+            <div class="chevron"></div>
+          </div>
+          <div class="section-header-row">Güvenlik Profili</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Tolerans</div>
+              <div class="settings-row-sub">%85 · Standart</div>
+            </div>
+            <div class="chevron"></div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Knox Biyometrik</div>
+              <div class="settings-row-sub">Ek parmak izi katmanı</div>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+          <div class="section-header-row">Yedek Erişim</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Samsung Hesabı</div>
+              <div class="settings-row-sub">Gesture unutulursa</div>
+            </div>
+            <div class="chevron"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">2 · Ayarlar menüsü</div>
+  </div>
+
+  <!-- EKRAN 3: Gizli Panel Açıldı -->
+  <div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="screen">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>●●● 5G 🔋</span>
+        </div>
+        <div class="success-screen">
+          <div class="success-icon">🔓</div>
+          <div style="font-size:11px;font-weight:500;color:#fff">Gizli Panel</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.4);text-align:center">Gesture doğrulandı · Knox güvenceli</div>
+          <div style="height:1px;background:rgba(255,255,255,0.08);width:100%;margin:4px 0"></div>
+          <div class="app-row">
+            <div class="secret-app">
+              <div class="secret-app-icon" style="background:rgba(29,184,115,0.15);border:0.5px solid rgba(29,184,115,0.3)">💼</div>
+              <div class="secret-app-name">İş Dosyaları</div>
+            </div>
+            <div class="secret-app">
+              <div class="secret-app-icon" style="background:rgba(33,150,243,0.15);border:0.5px solid rgba(33,150,243,0.3)">🏦</div>
+              <div class="secret-app-name">Banka</div>
+            </div>
+            <div class="secret-app">
+              <div class="secret-app-icon" style="background:rgba(156,39,176,0.15);border:0.5px solid rgba(156,39,176,0.3)">🔒</div>
+              <div class="secret-app-name">Özel Notlar</div>
+            </div>
+          </div>
+          <div class="hidden-badge">Dışarıdan sıfır görsel iz</div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">3 · Gizli panel açıldı</div>
+  </div>
+
+</div>
