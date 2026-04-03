@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGBA – Güvenlik Analizi</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f1a; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; padding: 24px 16px; }
+  h2 { color: #fff; font-size: 17px; font-weight: 500; text-align: center; margin-bottom: 4px; }
+  .subtitle { color: rgba(255,255,255,0.35); font-size: 12px; text-align: center; margin-bottom: 24px; }
+
+  .attacks { display: flex; flex-direction: column; gap: 16px; max-width: 600px; margin: 0 auto; }
+
+  .attack-card { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; }
+  .attack-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+  .attack-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .attack-title { font-size: 13px; font-weight: 600; color: #fff; }
+  .attack-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .risk-badge { margin-left: auto; font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 600; flex-shrink: 0; }
+  .risk-high { background: rgba(231,76,60,0.2); color: #e74c3c; border: 0.5px solid rgba(231,76,60,0.3); }
+  .risk-mid { background: rgba(243,156,18,0.2); color: #f39c12; border: 0.5px solid rgba(243,156,18,0.3); }
+  .risk-low { background: rgba(29,184,115,0.15); color: #1DB873; border: 0.5px solid rgba(29,184,115,0.3); }
+
+  .attack-body { padding: 0 16px 16px; display: none; }
+  .attack-body.open { display: block; }
+
+  .vs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .vs-box { border-radius: 10px; padding: 10px 12px; }
+  .vs-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .vs-text { font-size: 11px; line-height: 1.6; }
+  .vs-bad { background: rgba(231,76,60,0.08); border: 0.5px solid rgba(231,76,60,0.2); }
+  .vs-bad .vs-label { color: #e74c3c; }
+  .vs-bad .vs-text { color: rgba(255,255,255,0.6); }
+  .vs-good { background: rgba(29,184,115,0.08); border: 0.5px solid rgba(29,184,115,0.2); }
+  .vs-good .vs-label { color: #1DB873; }
+  .vs-good .vs-text { color: rgba(255,255,255,0.6); }
+
+  .demo-wrap { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 12px; }
+  .demo-title { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+
+  /* Brute Force animasyonu */
+  .bf-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+  .bf-cell { height: 18px; border-radius: 3px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 7px; color: rgba(255,255,255,0.2); transition: all 0.15s; }
+  .bf-cell.trying { background: rgba(243,156,18,0.3); color: #f39c12; }
+  .bf-cell.failed { background: rgba(231,76,60,0.15); color: rgba(231,76,60,0.4); }
+  .bf-status { font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 8px; }
+  .bf-status span { color: #1DB873; }
+
+  /* Shoulder Surfing */
+  .ss-scene { display: flex; align-items: center; gap: 16px; }
+  .ss-phone { width: 90px; background: #0a0a0a; border-radius: 18px; padding: 7px 5px; border: 1.5px solid #222; flex-shrink: 0; }
+  .ss-notch { width: 28px; height: 5px; background: #1a1a1a; border-radius: 4px; margin: 0 auto 5px; }
+  .ss-screen { background: #1c1c2e; border-radius: 10px; padding: 5px; height: 110px; overflow: hidden; }
+  .ss-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
+  .ss-ic { width: 22px; height: 22px; border-radius: 6px; margin: 0 auto; }
+  .eye-indicator { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .eye-ring { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.4s; }
+  .eye-ring.danger { background: rgba(231,76,60,0.2); border: 1.5px solid rgba(231,76,60,0.5); }
+  .eye-ring.safe { background: rgba(29,184,115,0.15); border: 1.5px solid rgba(29,184,115,0.4); }
+  .eye-text { font-size: 9px; font-weight: 600; text-align: center; transition: all 0.4s; }
+  .eye-text.danger { color: #e74c3c; }
+  .eye-text.safe { color: #1DB873; }
+  .ss-desc { flex: 1; font-size: 10px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+  .ss-toggle { display: flex; gap: 6px; margin-top: 10px; }
+  .ss-btn { flex: 1; padding: 6px; border-radius: 7px; border: 0.5px solid; font-size: 10px; cursor: pointer; transition: all 0.2s; background: transparent; }
+  .ss-btn.red-btn { border-color: rgba(231,76,60,0.4); color: #e74c3c; }
+  .ss-btn.red-btn.active, .ss-btn.red-btn:hover { background: rgba(231,76,60,0.15); }
+  .ss-btn.green-btn { border-color: rgba(29,184,115,0.4); color: #1DB873; }
+  .ss-btn.green-btn.active, .ss-btn.green-btn:hover { background: rgba(29,184,115,0.1); }
+
+  /* Accidental Trigger */
+  .at-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .at-item { flex: 1; min-width: 120px; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px; }
+  .at-label { font-size: 9px; color: rgba(255,255,255,0.35); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .at-val { font-size: 12px; font-weight: 600; }
+  .at-bar { height: 4px; border-radius: 2px; margin-top: 4px; background: rgba(255,255,255,0.1); overflow: hidden; }
+  .at-fill { height: 100%; border-radius: 2px; transition: width 0.8s; }
+
+  .chevron { font-size: 12px; color: rgba(255,255,255,0.3); margin-left: auto; transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+</style>
+</head>
+<body>
+
+<h2>SGBA — Güvenlik Analizi</h2>
+<div class="subtitle">Olası saldırı vektörleri ve SGBA'nın savunma mekanizmaları</div>
+
+<div class="attacks">
+
+  <!-- BRUTE FORCE -->
+  <div class="attack-card">
+    <div class="attack-header" onclick="toggle('bf')">
+      <div class="attack-icon" style="background:rgba(231,76,60,0.12)">🔓</div>
+      <div>
+        <div class="attack-title">Brute Force (Kaba Kuvvet)</div>
+        <div class="attack-sub">Tüm kombinasyonları deneyerek kırma girişimi</div>
+      </div>
+      <div class="risk-badge risk-low">Çok Düşük Risk</div>
+      <div class="chevron" id="chev-bf">▼</div>
+    </div>
+    <div class="attack-body" id="body-bf">
+      <div class="vs-row">
+        <div class="vs-box vs-bad">
+          <div class="vs-label">Klasik PIN/Şifre</div>
+          <div class="vs-text">10.000 kombinasyon (4 hane). Deneme hatası görsel. Saldırgan ilerlemeyi takip eder.</div>
+        </div>
+        <div class="vs-box vs-good">
+          <div class="vs-label">SGBA Gesture</div>
+          <div class="vs-text">Serbest vektör uzayı = astronomik kombinasyon. Yanlış denemede sıfır geri bildirim. Saldırgan nerede olduğunu bilemez.</div>
+        </div>
+      </div>
+      <div class="demo-wrap">
+        <div class="demo-title">Simülasyon — Saldırgan sistemi kırmaya çalışıyor</div>
+        <div class="bf-grid" id="bf-grid"></div>
+        <div class="bf-status" id="bf-status">Başlatmak için tıkla</div>
+        <button onclick="startBF()" style="width:100%;margin-top:8px;padding:6px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:10px;cursor:pointer">Simülasyonu Başlat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOULDER SURFING -->
+  <div class="attack-card">
+    <div class="attack-header" onclick="toggle('ss')">
+      <div class="attack-icon" style="background:rgba(243,156,18,0.12)">👁️</div>
+      <div>
+        <div class="attack-title">Shoulder Surfing (Omuz Sörfü)</div>
+        <div class="attack-sub">Kullanıcıyı izleyerek hareketi öğrenme</div>
+      </div>
+      <div class="risk-badge risk-mid">Orta Risk</div>
+      <div class="chevron" id="chev-ss">▼</div>
+    </div>
+    <div class="attack-body" id="body-ss">
+      <div class="vs-row">
+        <div class="vs-box vs-bad">
+          <div class="vs-label">Klasik Yöntem</div>
+          <div class="vs-text">Ekranda görsel iz. Arkadan bakan kişi şekli net görür. Tek seferlik gözlem yeterli.</div>
+        </div>
+        <div class="vs-box vs-good">
+          <div class="vs-label">SGBA</div>
+          <div class="vs-text">Ekranda sıfır iz. Sadece parmak hareketi izlenebilir. Knox biyometrik 2. katman eklenebilir.</div>
+        </div>
+      </div>
+      <div class="demo-wrap">
+        <div class="demo-title">Senaryo — Gözlemci ne görüyor?</div>
+        <div class="ss-scene">
+          <div class="ss-phone">
+            <div class="ss-notch"></div>
+            <div class="ss-screen" id="ss-screen">
+              <div class="ss-grid" id="ss-grid"></div>
+            </div>
+          </div>
+          <div class="eye-indicator">
+            <div class="eye-ring danger" id="eye-ring">👁️</div>
+            <div class="eye-text danger" id="eye-text">Görüyor</div>
+          </div>
+          <div class="ss-desc" id="ss-desc">Klasik Güvenli Klasör: gözlemci simgeyi net görüyor ve "ne saklıyorsun?" diye soruyor.</div>
+        </div>
+        <div class="ss-toggle">
+          <button class="ss-btn red-btn active" id="ss-btn-bad" onclick="ssSwitch('bad')">Klasik Yöntem</button>
+          <button class="ss-btn green-btn" id="ss-btn-good" onclick="ssSwitch('good')">SGBA ile</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCIDENTAL TRIGGER -->
+  <div class="attack-card">
+    <div class="attack-header" onclick="toggle('at')">
+      <div class="attack-icon" style="background:rgba(52,168,83,0.12)">⚡</div>
+      <div>
+        <div class="attack-title">Kazara Tetikleme</div>
+        <div class="attack-sub">Rastgele dokunuşun gizli paneli açması riski</div>
+      </div>
+      <div class="risk-badge risk-low">Düşük Risk</div>
+      <div class="chevron" id="chev-at">▼</div>
+    </div>
+    <div class="attack-body" id="body-at">
+      <div class="vs-row">
+        <div class="vs-box vs-bad">
+          <div class="vs-label">Risk Senaryosu</div>
+          <div class="vs-text">Cep içinde parmak sürçmesi veya hızlı dokunuş gesture olarak algılanabilir.</div>
+        </div>
+        <div class="vs-box vs-good">
+          <div class="vs-label">SGBA Çözümü</div>
+          <div class="vs-text">Hız filtresi + Proximity Sensor çift kalkan. Cep algılandığında sistem uyku moduna girer.</div>
+        </div>
+      </div>
+      <div class="demo-wrap">
+        <div class="demo-title">Güvenlik Filtreleri</div>
+        <div class="at-row">
+          <div class="at-item">
+            <div class="at-label">Hız Filtresi</div>
+            <div class="at-val" style="color:#1DB873">Aktif</div>
+            <div class="at-bar"><div class="at-fill" style="width:85%;background:#1DB873"></div></div>
+          </div>
+          <div class="at-item">
+            <div class="at-label">Proximity Sensor</div>
+            <div class="at-val" style="color:#1DB873">Aktif</div>
+            <div class="at-bar"><div class="at-fill" style="width:100%;background:#1DB873"></div></div>
+          </div>
+          <div class="at-item">
+            <div class="at-label">Kazara Tetik. Riski</div>
+            <div class="at-val" style="color:#1DB873">%0.3</div>
+            <div class="at-bar"><div class="at-fill" style="width:3%;background:#1DB873"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggle(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+// Brute Force sim
+const bfGrid = document.getElementById('bf-grid');
+for (let i = 0; i < 32; i++) {
+  const c = document.createElement('div');
+  c.className = 'bf-cell';
+  c.id = 'bfc' + i;
+  c.textContent = '—';
+  bfGrid.appendChild(c);
+}
+
+let bfRunning = false;
+function startBF() {
+  if (bfRunning) return;
+  bfRunning = true;
+  document.querySelectorAll('.bf-cell').forEach(c => { c.className = 'bf-cell'; c.textContent = '—'; });
+  document.getElementById('bf-status').innerHTML = 'Saldırgan deniyor...';
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i > 0) {
+      const prev = document.getElementById('bfc' + (i - 1));
+      prev.classList.remove('trying');
+      prev.classList.add('failed');
+      prev.textContent = '✗';
+    }
+    if (i >= 32) {
+      clearInterval(interval);
+      document.getElementById('bf-status').innerHTML = '32 deneme · <span>Sıfır geri bildirim</span> · Saldırgan nerede olduğunu bilemiyor';
+      bfRunning = false;
+      return;
+    }
+    const cell = document.getElementById('bfc' + i);
+    cell.classList.add('trying');
+    cell.textContent = i + 1;
+    i++;
+  }, 180);
+}
+
+// Shoulder Surfing
+function buildSSGrid(mode) {
+  const grid = document.getElementById('ss-grid');
+  grid.innerHTML = '';
+  const colors = ['#1a73e8','#34a853','#ea4335','#fbbc04','#9c27b0','#ff5722','#009688','#607d8b','#3f51b5'];
+  for (let i = 0; i < 9; i++) {
+    const ic = document.createElement('div');
+    ic.className = 'ss-ic';
+    ic.style.background = colors[i];
+    ic.style.borderRadius = '6px';
+    grid.appendChild(ic);
+  }
+  if (mode === 'bad') {
+    const sf = document.createElement('div');
+    sf.style.cssText = 'margin-top:4px;font-size:6px;color:rgba(231,76,60,0.8);text-align:center;font-weight:700';
+    sf.textContent = '🔒 Güvenli Klasör';
+    grid.appendChild(sf);
+  }
+}
+
+buildSSGrid('bad');
+
+function ssSwitch(mode) {
+  buildSSGrid(mode);
+  const ring = document.getElementById('eye-ring');
+  const text = document.getElementById('eye-text');
+  const desc = document.getElementById('ss-desc');
+  document.getElementById('ss-btn-bad').classList.remove('active');
+  document.getElementById('ss-btn-good').classList.remove('active');
+  if (mode === 'bad') {
+    ring.className = 'eye-ring danger';
+    text.className = 'eye-text danger';
+    text.textContent = 'Görüyor';
+    desc.textContent = 'Klasik Güvenli Klasör: gözlemci simgeyi net görüyor ve "ne saklıyorsun?" diye soruyor.';
+    document.getElementById('ss-btn-bad').classList.add('active');
+  } else {
+    ring.className = 'eye-ring safe';
+    text.className = 'eye-text safe';
+    text.textContent = 'Göremez';
+    desc.textContent = 'SGBA ile: ekranda hiçbir iz yok. Gözlemci normal bir ana ekran görüyor. Gizli bölümün varlığından haberdar olamaz.';
+    document.getElementById('ss-btn-good').classList.add('active');
+  }
+}
+</script>
+</body>
+</html>
