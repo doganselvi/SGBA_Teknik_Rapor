@@ -1,3 +1,9 @@
+## 🧪 Canlı Demo
+👉 [Gesture Demo](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo.html)
+👉 [UI Mockup](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html)
+👉 [Gesture Kayıt](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_kayit.html)
+👉 [Güvenlik Analizi](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_guvenlik_analizi.html)
+👉 [Kullanım Senaryoları](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html)
 # 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v2.9)
 
 SGBA (Zero-Visual Trace Security Algorithm), mobil cihazlarda gizli katmanlara erişimi **hiçbir görsel iz bırakmadan** sağlayan, gesture tabanlı ve davranış analizli yeni nesil bir güvenlik yaklaşımıdır.
