@@ -1,5 +1,14 @@
 ## 🧪 Canlı Demo
-👉 🚀 v4 Final Demo (Uçtan Uca Akış) 👉 ✍️ v2 Kayıt Sistemi (Gelişmiş Vektör) 👉 📱 UI Mockup 👉 🛡️ Güvenlik Analizi 👉 📋 Kullanım Senaryoları
+
+👉 [v4 Final Demo (Uçtan Uca Akış)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo_v4%20NEW.html)
+
+👉 [UI Mockup](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html)
+
+👉 [v2 Kayıt Sistemi (Gelişmiş Vektör)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_kayit_v2%20NEW.html)
+
+👉 [Güvenlik Analizi](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_guvenlik_analizi.html)
+
+👉 [Kullanım Senaryoları](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html)
 
 # 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v2.9)
 
