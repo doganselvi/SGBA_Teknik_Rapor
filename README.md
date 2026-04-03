@@ -1,26 +1,108 @@
-🛡️ SGBA — Sıfır Görsel İz Güvenlik Algoritması (v2.9)
-SGBA (Zero-Visual Trace Security Algorithm), mobil cihazlarda gizli katmanlara erişim için tasarlanmış, Sıfır Görsel İz prensibiyle çalışan bir güvenlik protokolüdür.
+# 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v2.9)
 
-🚀 Proje Vizyonu
-Geleneksel "Güvenli Klasör" yapıları ekranda bir simge veya kilit ekranı bırakırken, SGBA sistemi cihazı tamamen "doğal" görünümünde tutar. Sistem, sadece kullanıcıya özel tanımlanmış Dinamik Zaman Bükmesi (DTW) tabanlı parmak hareketleriyle (Gesture) tetiklenir.
+SGBA (Zero-Visual Trace Security Algorithm), mobil cihazlarda gizli katmanlara erişimi **hiçbir görsel iz bırakmadan** sağlayan, gesture tabanlı ve davranış analizli yeni nesil bir güvenlik yaklaşımıdır.
 
-🛠️ Teknik Özellikler
-Algoritma: DTW (Dynamic Time Warping) tabanlı biyometrik hareket doğrulama.
+---
 
-Optimizasyon: Cihazın NPU (Neural Processing Unit) birimiyle entegre, düşük güç tüketimli hesaplama.
+## 🚀 Proje Vizyonu
 
-Güvenlik Katmanları: Hız filtresi ve Proximity Sensor (Yakınlık Sensörü) ile kazara tetikleme önleyici çift kalkan.
+Geleneksel güvenlik çözümleri (ör. gizli klasörler), her zaman bir **iz** bırakır:
+- ikon
+- kilit ekranı
+- erişim ipuçları
 
-Arayüz: %100 HTML/JS tabanlı prototiplerle test edilmiş kullanıcı deneyimi.
+SGBA ise bu izleri tamamen ortadan kaldırır.
 
-📂 Depo İçeriği
-sgba_guvenlik_analizi.html: Brute Force ve Shoulder Surfing saldırılarına karşı savunma simülasyonları.
+> Cihaz dışarıdan bakıldığında tamamen normal görünür.  
+> Sadece kullanıcıya özel bir gesture ile gizli katman tetiklenir.
 
-sgba_gesture_kayit.html: Kullanıcı hareketinin vektörleştirilmesi ve referans kayıt süreci.
+---
 
-sgba_kullanim_senaryolari.html: Gazeteci, ebeveyn ve kurumsal BYOD kullanım durumları.
+## 🧠 Temel Yaklaşım
 
-SGBA_Konsept_Demo_v2.9.pdf: Sistemin tüm matematiksel ve teorik altyapısını içeren ana rapor.
+SGBA, kullanıcıya özel dokunma davranışını analiz eder ve doğrular:
 
-👨‍💻 Geliştirici Hakkında
-Bu proje, Ankara'da teknik eğitimine devam eden, Elektrik-Elektronik Mühendisliği hedefiyle üreten bir 11. sınıf ATP öğrencisi tarafından geliştirilmiştir.
+- Zamanlama
+- Hareket şekli
+- Hız
+- Basınç (genişletilebilir)
+
+Bu sayede sistem:
+- rastgele dokunuşları reddeder  
+- sadece gerçek kullanıcıyı tanır  
+
+---
+
+## 🛠️ Teknik Özellikler
+
+### 🔹 Algoritma
+- **DTW (Dynamic Time Warping)** tabanlı gesture doğrulama
+- Vektörleştirilmiş hareket karşılaştırma
+
+### 🔹 AI & Optimizasyon
+- NPU (Neural Processing Unit) üzerinde çalışacak şekilde tasarım
+- Event-driven tetikleme (sadece gerekli anda aktif)
+- Ultra düşük güç tüketimi
+
+### 🔹 Güvenlik Katmanları
+- Hız filtresi → kazara dokunuşları engeller  
+- Proximity Sensor → cep içi tetiklemeyi önler  
+- Feedback suppression → brute-force denemeleri zorlaştırır  
+
+---
+
+## 🧪 Güvenlik Analizi
+
+SGBA aşağıdaki saldırı türlerine karşı test edilmiştir:
+
+- ❌ Brute Force → geri bildirim yok → öğrenme engellenir  
+- ❌ Shoulder Surfing → görsel iz yok → gözle takip edilemez  
+- ❌ Accidental Trigger → sensör + hız filtresi ile engellenir  
+
+---
+
+## 🧩 Demo & Simülasyonlar
+
+- `sgba_gesture_kayit.html`  
+  → Gesture kayıt ve doğrulama süreci  
+
+- `sgba_guvenlik_analizi.html`  
+  → Saldırı simülasyonları  
+
+- `sgba_kullanim_senaryolari.html`  
+  → Gerçek kullanım senaryoları  
+
+- `SGBA_Konsept_Demo_v2.9.pdf`  
+  → Matematiksel ve sistem mimarisi  
+
+---
+
+## 🌍 Kullanım Alanları
+
+- 📰 Gazetecilik & Aktivizm  
+- 👨‍👩‍👧‍👦 Ebeveyn gizlilik ihtiyaçları  
+- 🏢 Kurumsal BYOD politikaları  
+- 🔐 Yüksek gizlilik gerektiren bireysel kullanım  
+
+---
+
+## 🔮 Gelecek Geliştirmeler
+
+- Gerçek cihaz entegrasyonu (Android / One UI)
+- Sensör verisi genişletme (gyroscope, pressure)
+- AI model iyileştirmeleri
+- Performans ölçümleri
+
+---
+
+## 👨‍💻 Geliştirici
+
+Bu proje, Ankara'da teknik eğitimine devam eden,  
+Elektrik-Elektronik Mühendisliği hedefi olan bir 11. sınıf ATP öğrencisi tarafından geliştirilmiştir.
+
+---
+
+## 📌 Not
+
+Bu proje bir **konsept ve prototip çalışmasıdır**.  
+Amaç, mevcut mobil güvenlik yaklaşımlarına alternatif bir model sunmaktır.
