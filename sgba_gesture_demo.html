@@ -1,155 +1,363 @@
 
 <style>
-  @keyframes draw { to { stroke-dashoffset: 0; } }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.15)} }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-  .step-dot { width:8px;height:8px;border-radius:50%;background:var(--color-border-secondary);flex-shrink:0;transition:background .3s; }
-  .step-dot.active { background:#1DB873; animation: pulse .8s ease-in-out infinite; }
-  .step-dot.done { background:#1DB873; animation:none; }
-  #status-text { font-size:13px;color:var(--color-text-secondary);text-align:center;min-height:20px;transition:opacity .3s; }
-  #dtw-bar { transition:width .6s ease; }
-  .label-fade { animation: fadeIn .4s ease; }
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.15)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(400%)}}
+@keyframes ripple{0%{transform:scale(0.6);opacity:0.7}100%{transform:scale(1.8);opacity:0}}
+@keyframes ringPulse{0%,100%{opacity:0.3;transform:scale(1)}50%{opacity:0.7;transform:scale(1.04)}}
+@keyframes successPop{0%{transform:scale(0.85);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0;transition:background .3s}
+.step-dot.active{background:#1DB873;animation:pulse .8s ease-in-out infinite}
+.step-dot.done{background:#1DB873;animation:none}
+#dtw-bar{transition:width .6s ease}
+#status-text{font-size:12px;color:#555;text-align:center;min-height:18px}
+.pin-btn{
+  width:56px;height:56px;border-radius:50%;
+  background:#f0f0f0;
+  border:1.5px solid #bbb;
+  font-size:20px;font-weight:500;
+  color:#111;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .15s,transform .1s;
+  user-select:none;
+  box-shadow:0 1px 3px rgba(0,0,0,0.12);
+}
+.pin-btn:hover{background:#e0e0e0}
+.pin-btn:active{transform:scale(0.92);background:#d0d0d0}
+.pin-dot{width:12px;height:12px;border-radius:50%;border:2px solid #aaa;transition:background .2s,border-color .2s;background:transparent}
+.pin-dot.filled{background:#1DB873;border-color:#1DB873}
+.pin-dot.err{background:#e84545;border-color:#e84545}
+#fp-btn{
+  width:68px;height:68px;border-radius:50%;
+  background:#f0f0f0;
+  border:2px solid #bbb;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  transition:border-color .3s,background .3s;
+  user-select:none;-webkit-user-select:none;
+  box-shadow:0 1px 4px rgba(0,0,0,0.15);
+}
+#fp-btn.scanning{border-color:#1DB873;background:#f0fff8}
+#fp-btn.success{border-color:#1DB873;background:#e0fff2}
+#fp-scan{position:absolute;top:0;left:0;width:100%;height:25%;background:linear-gradient(transparent,rgba(29,184,115,0.45),transparent);animation:scanline 1s linear infinite;display:none}
+#fp-ripple1,#fp-ripple2{position:absolute;width:100%;height:100%;border-radius:50%;border:2px solid rgba(29,184,115,0.5);animation:ripple 1.2s ease-out infinite;display:none}
+#fp-ripple2{animation-delay:.5s}
+.fp-ring{position:absolute;width:100%;height:100%;border-radius:50%;border:2px solid rgba(29,184,115,0.25);animation:ringPulse 1.2s ease-in-out infinite;display:none}
+#fp-progress{position:absolute;bottom:0;left:0;height:3px;width:0%;background:#1DB873;transition:width .1s linear}
 </style>
 
-<div style="padding:1rem 0">
-  <div style="max-width:480px;margin:0 auto">
+<div style="padding:1rem 0;max-width:480px;margin:0 auto">
 
-    <!-- Gesture canvas -->
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:16px;margin-bottom:12px">
-      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:8px;text-align:center">Ana ekran · gesture çiziliyor (sıfır görsel iz)</div>
-      <svg id="gesture-svg" width="100%" viewBox="0 0 320 200" style="display:block">
-        <defs>
-          <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </marker>
-        </defs>
-        <!-- Sahte uygulama ikonları (arka plan) -->
-        <rect x="20" y="20" width="44" height="44" rx="12" fill="rgba(26,115,232,0.15)" stroke="rgba(26,115,232,0.2)" stroke-width="0.5"/>
-        <rect x="80" y="20" width="44" height="44" rx="12" fill="rgba(52,168,83,0.15)" stroke="rgba(52,168,83,0.2)" stroke-width="0.5"/>
-        <rect x="140" y="20" width="44" height="44" rx="12" fill="rgba(234,67,53,0.15)" stroke="rgba(234,67,53,0.2)" stroke-width="0.5"/>
-        <rect x="200" y="20" width="44" height="44" rx="12" fill="rgba(251,188,4,0.15)" stroke="rgba(251,188,4,0.2)" stroke-width="0.5"/>
-        <rect x="260" y="20" width="44" height="44" rx="12" fill="rgba(156,39,176,0.15)" stroke="rgba(156,39,176,0.2)" stroke-width="0.5"/>
-        <rect x="20" y="80" width="44" height="44" rx="12" fill="rgba(0,150,136,0.15)" stroke="rgba(0,150,136,0.2)" stroke-width="0.5"/>
-        <rect x="80" y="80" width="44" height="44" rx="12" fill="rgba(96,125,139,0.15)" stroke="rgba(96,125,139,0.2)" stroke-width="0.5"/>
-        <rect x="140" y="80" width="44" height="44" rx="12" fill="rgba(255,87,34,0.15)" stroke="rgba(255,87,34,0.2)" stroke-width="0.5"/>
-        <rect x="200" y="80" width="44" height="44" rx="12" fill="rgba(33,150,243,0.15)" stroke="rgba(33,150,243,0.2)" stroke-width="0.5"/>
-        <rect x="260" y="80" width="44" height="44" rx="12" fill="rgba(76,175,80,0.15)" stroke="rgba(76,175,80,0.2)" stroke-width="0.5"/>
-
-        <!-- Gesture path: Z harfi gibi -->
-        <path id="gpath" d="M80 140 L240 140 L80 180 L240 180"
-          fill="none" stroke="#1DB873" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-          stroke-dasharray="500" stroke-dashoffset="500"/>
-        <!-- Parmak noktası -->
-        <circle id="finger-dot" cx="80" cy="140" r="6" fill="#1DB873" opacity="0"/>
+  <div id="phase-gesture">
+    <div style="background:#f7f7f7;border-radius:12px;border:1px solid #ddd;padding:14px;margin-bottom:12px;overflow:hidden">
+      <div style="font-size:11px;color:#888;margin-bottom:8px;text-align:center">Ana ekran · gesture çiziliyor (sıfır görsel iz)</div>
+      <svg id="gesture-svg" width="100%" viewBox="0 0 320 190" style="display:block;overflow:visible">
+        <g id="icon-grid">
+          <rect x="20" y="14" width="42" height="42" rx="11" fill="rgba(26,115,232,0.15)" stroke="rgba(26,115,232,0.3)" stroke-width="1"/>
+          <rect x="76" y="14" width="42" height="42" rx="11" fill="rgba(52,168,83,0.15)" stroke="rgba(52,168,83,0.3)" stroke-width="1"/>
+          <rect x="132" y="14" width="42" height="42" rx="11" fill="rgba(234,67,53,0.15)" stroke="rgba(234,67,53,0.3)" stroke-width="1"/>
+          <rect x="188" y="14" width="42" height="42" rx="11" fill="rgba(251,188,4,0.15)" stroke="rgba(251,188,4,0.3)" stroke-width="1"/>
+          <rect x="244" y="14" width="42" height="42" rx="11" fill="rgba(156,39,176,0.15)" stroke="rgba(156,39,176,0.3)" stroke-width="1"/>
+          <rect x="20" y="70" width="42" height="42" rx="11" fill="rgba(0,150,136,0.15)" stroke="rgba(0,150,136,0.3)" stroke-width="1"/>
+          <rect x="76" y="70" width="42" height="42" rx="11" fill="rgba(96,125,139,0.15)" stroke="rgba(96,125,139,0.3)" stroke-width="1"/>
+          <rect x="132" y="70" width="42" height="42" rx="11" fill="rgba(255,87,34,0.15)" stroke="rgba(255,87,34,0.3)" stroke-width="1"/>
+          <rect x="188" y="70" width="42" height="42" rx="11" fill="rgba(33,150,243,0.15)" stroke="rgba(33,150,243,0.3)" stroke-width="1"/>
+          <rect x="244" y="70" width="42" height="42" rx="11" fill="rgba(76,175,80,0.15)" stroke="rgba(76,175,80,0.3)" stroke-width="1"/>
+          <rect x="20" y="126" width="42" height="42" rx="11" fill="rgba(233,30,99,0.15)" stroke="rgba(233,30,99,0.3)" stroke-width="1"/>
+          <rect x="76" y="126" width="42" height="42" rx="11" fill="rgba(103,58,183,0.15)" stroke="rgba(103,58,183,0.3)" stroke-width="1"/>
+          <rect x="132" y="126" width="42" height="42" rx="11" fill="rgba(0,188,212,0.15)" stroke="rgba(0,188,212,0.3)" stroke-width="1"/>
+          <rect x="188" y="126" width="42" height="42" rx="11" fill="rgba(255,152,0,0.15)" stroke="rgba(255,152,0,0.3)" stroke-width="1"/>
+          <rect x="244" y="126" width="42" height="42" rx="11" fill="rgba(63,81,181,0.15)" stroke="rgba(63,81,181,0.3)" stroke-width="1"/>
+        </g>
+        <path id="gpath" d="M70 148 L250 148 L70 175 L250 175" fill="none" stroke="#1DB873" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="600" stroke-dashoffset="600" opacity="0"/>
+        <circle id="finger-dot" cx="70" cy="148" r="5" fill="#1DB873" opacity="0"/>
       </svg>
     </div>
 
-    <!-- Adım göstergesi -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
       <div class="step-dot active" id="dot1"></div>
       <div class="step-dot" id="dot2"></div>
       <div class="step-dot" id="dot3"></div>
       <div class="step-dot" id="dot4"></div>
     </div>
-
-    <div id="status-text">Kullanıcı ana ekranda gesture çiziyor...</div>
-
-    <!-- DTW Eşleşme Barı -->
-    <div style="margin:12px 0 8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">
-        <span>DTW Benzerlik Skoru</span>
-        <span id="dtw-pct">0%</span>
+    <div id="status-text" style="margin-bottom:10px">Demoyu başlatmak için butona bas</div>
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#777;margin-bottom:4px">
+        <span>DTW benzerlik skoru</span><span id="dtw-pct">0%</span>
       </div>
-      <div style="background:var(--color-background-secondary);border-radius:4px;height:6px;overflow:hidden;border:0.5px solid var(--color-border-tertiary)">
+      <div style="background:#e8e8e8;border-radius:4px;height:6px;overflow:hidden;border:1px solid #ccc">
         <div id="dtw-bar" style="height:100%;width:0%;background:#1DB873;border-radius:4px"></div>
       </div>
     </div>
-
-    <!-- Sonuç kutusu -->
-    <div id="result-box" style="display:none;padding:10px 14px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);font-size:12px;color:var(--color-text-primary);text-align:center"></div>
-
-    <!-- Buton -->
-    <div style="text-align:center;margin-top:14px">
-      <button id="demo-btn" onclick="startDemo()" style="padding:8px 20px;font-size:13px">Demoyu Başlat ↗</button>
+    <div style="text-align:center">
+      <button id="demo-btn" onclick="startDemo()" style="padding:9px 24px;font-size:13px;background:#1DB873;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:500">Demoyu Başlat</button>
     </div>
-
   </div>
+
+  <div id="phase-pin" style="display:none;animation:fadeIn .4s ease">
+    <div id="pin-box" style="background:#fff;border-radius:12px;border:1.5px solid #ddd;padding:22px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+      <div style="font-size:14px;font-weight:500;color:#111;margin-bottom:4px">Gizli Panel Kilidi</div>
+      <div style="font-size:11px;color:#777;margin-bottom:20px">PIN gir veya parmak iziyle aç</div>
+
+      <div id="pin-dots" style="display:flex;justify-content:center;gap:14px;margin-bottom:20px">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:210px;margin:0 auto 22px">
+        <div class="pin-btn" onclick="pinPress('1')">1</div>
+        <div class="pin-btn" onclick="pinPress('2')">2</div>
+        <div class="pin-btn" onclick="pinPress('3')">3</div>
+        <div class="pin-btn" onclick="pinPress('4')">4</div>
+        <div class="pin-btn" onclick="pinPress('5')">5</div>
+        <div class="pin-btn" onclick="pinPress('6')">6</div>
+        <div class="pin-btn" onclick="pinPress('7')">7</div>
+        <div class="pin-btn" onclick="pinPress('8')">8</div>
+        <div class="pin-btn" onclick="pinPress('9')">9</div>
+        <div class="pin-btn" onclick="pinClear()" style="font-size:16px">⌫</div>
+        <div class="pin-btn" onclick="pinPress('0')">0</div>
+        <div class="pin-btn" onclick="pinClear()" style="font-size:11px;color:#666">Sil</div>
+      </div>
+
+      <div style="border-top:1px solid #eee;padding-top:18px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div style="position:relative;width:68px;height:68px">
+            <div id="fp-ripple1"></div>
+            <div id="fp-ripple2"></div>
+            <div id="fp-btn"
+              onmousedown="fpStart()" onmouseup="fpStop()" onmouseleave="fpStop()"
+              ontouchstart="fpStart(event)" ontouchend="fpStop()" ontouchcancel="fpStop()">
+              <div class="fp-ring" id="fp-ring"></div>
+              <div id="fp-scan"></div>
+              <div id="fp-progress"></div>
+              <svg id="fp-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.4" stroke-linecap="round">
+                <path d="M12 1C8 1 5 4 5 8"/>
+                <path d="M19 8c0-3.87-3.13-7-7-7"/>
+                <path d="M12 7c-1.1 0-2 .9-2 2v3"/>
+                <path d="M12 7c1.1 0 2 .9 2 2v3c0 1.1-.9 2-2 2"/>
+                <path d="M8 12v-2"/>
+                <path d="M16 12v-1"/>
+                <path d="M6 14c0 3.31 2.69 6 6 6"/>
+                <path d="M18 14c0 1.2-.35 2.32-.96 3.26"/>
+                <path d="M12 20v-4"/>
+              </svg>
+              <svg id="fp-check" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1DB873" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;animation:successPop .4s ease">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="phase-folder" style="display:none;animation:fadeIn .5s ease">
+    <div style="background:#fff;border-radius:12px;border:1.5px solid #ddd;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+      <div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">Gizli panel · yalnızca sana görünür</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(26,115,232,0.18);border:1.5px solid rgba(26,115,232,0.4)"></div>
+          <div style="font-size:10px;color:#555;font-weight:500">Banka</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(29,184,115,0.18);border:1.5px solid rgba(29,184,115,0.4)"></div>
+          <div style="font-size:10px;color:#555;font-weight:500">Kripto</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(156,39,176,0.18);border:1.5px solid rgba(156,39,176,0.4)"></div>
+          <div style="font-size:10px;color:#555;font-weight:500">Şifreler</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(234,67,53,0.18);border:1.5px solid rgba(234,67,53,0.4)"></div>
+          <div style="font-size:10px;color:#555;font-weight:500">Notlar</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid #eee;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:11px;color:#1DB873;font-weight:500">Klasör açıldı · SGBA aktif</div>
+        <button onclick="resetAll()" style="font-size:11px;padding:5px 14px;background:#f0f0f0;border:1px solid #ccc;border-radius:6px;cursor:pointer;color:#333">Sıfırla</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
-let running = false;
-const steps = [
-  { dot: 1, text: "Parmak hareketi başladı · X/Y koordinatlar dinleniyor...", dtw: 0 },
-  { dot: 2, text: "Vektör haritası oluşturuluyor · hareket kaydediliyor...", dtw: 35 },
-  { dot: 3, text: "DTW algoritması referans vektörle karşılaştırıyor...", dtw: 72 },
-  { dot: 4, text: "Eşleşme %88 · Gizli Panel açılıyor!", dtw: 88 },
-];
+let running=false,pinVal='',fpTimer=null,fpHolding=false;
+const CORRECT_PIN='2846',HOLD_MS=2000;
 
-function setDot(active) {
-  for (let i = 1; i <= 4; i++) {
-    const d = document.getElementById('dot' + i);
+function setDot(a){
+  for(let i=1;i<=4;i++){
+    const d=document.getElementById('dot'+i);
     d.classList.remove('active','done');
-    if (i < active) d.classList.add('done');
-    if (i === active) d.classList.add('active');
+    if(i<a)d.classList.add('done');
+    if(i===a)d.classList.add('active');
   }
 }
 
-function startDemo() {
-  if (running) return;
-  running = true;
-  const btn = document.getElementById('demo-btn');
-  btn.disabled = true;
-  btn.textContent = 'Çalışıyor...';
+function scrollIcons(dur,shift){
+  const g=document.getElementById('icon-grid');
+  const t0=performance.now();
+  function f(now){
+    const t=Math.min((now-t0)/dur,1);
+    const e=t<.5?2*t*t:-1+(4-2*t)*t;
+    g.setAttribute('transform',`translate(0,${-e*shift})`);
+    if(t<1)requestAnimationFrame(f);
+  }
+  requestAnimationFrame(f);
+}
 
-  const path = document.getElementById('gpath');
-  const dot = document.getElementById('finger-dot');
-  const status = document.getElementById('status-text');
-  const bar = document.getElementById('dtw-bar');
-  const pct = document.getElementById('dtw-pct');
-  const result = document.getElementById('result-box');
-
-  result.style.display = 'none';
-  path.style.strokeDashoffset = '500';
-  dot.style.opacity = '0';
-  bar.style.width = '0%';
-  pct.textContent = '0%';
+function startDemo(){
+  if(running)return;
+  running=true;
+  const btn=document.getElementById('demo-btn');
+  btn.disabled=true;btn.textContent='Çalışıyor...';btn.style.background='#aaa';
+  const path=document.getElementById('gpath');
+  const fdot=document.getElementById('finger-dot');
+  const bar=document.getElementById('dtw-bar');
+  const pct=document.getElementById('dtw-pct');
+  path.style.strokeDashoffset='600';path.style.transition='';
+  fdot.style.opacity='0';bar.style.width='0%';pct.textContent='0%';
+  document.getElementById('icon-grid').setAttribute('transform','translate(0,0)');
   setDot(1);
-  status.textContent = steps[0].text;
-
-  setTimeout(() => {
-    dot.style.opacity = '1';
-    path.style.transition = 'stroke-dashoffset 1.4s ease';
-    path.style.strokeDashoffset = '0';
+  document.getElementById('status-text').textContent='Parmak hareketi algılandı · koordinatlar dinleniyor...';
+  setTimeout(()=>{
+    fdot.style.opacity='1';
+    path.style.opacity='1';
+    path.style.transition='stroke-dashoffset 1.5s ease';
+    path.style.strokeDashoffset='0';
+    scrollIcons(1500,28);
     setDot(2);
-    status.textContent = steps[1].text;
-    bar.style.width = steps[1].dtw + '%';
-    pct.textContent = steps[1].dtw + '%';
-  }, 400);
-
-  setTimeout(() => {
+    document.getElementById('status-text').textContent='Vektör haritası oluşturuluyor...';
+    bar.style.width='35%';pct.textContent='35%';
+  },400);
+  setTimeout(()=>{
     setDot(3);
-    status.textContent = steps[2].text;
-    bar.style.width = steps[2].dtw + '%';
-    pct.textContent = steps[2].dtw + '%';
-  }, 1600);
-
-  setTimeout(() => {
+    document.getElementById('status-text').textContent='DTW algoritması referans vektörle karşılaştırıyor...';
+    bar.style.width='72%';pct.textContent='72%';
+  },1700);
+  setTimeout(()=>{
     setDot(4);
-    status.textContent = steps[3].text;
-    bar.style.width = '88%';
-    pct.textContent = '88%';
-    bar.style.background = '#1DB873';
-  }, 2600);
+    document.getElementById('status-text').textContent='Eşleşme %88 · PIN veya parmak izi bekleniyor...';
+    bar.style.width='88%';pct.textContent='88%';
+    fdot.style.opacity='0';
+  },2800);
+  setTimeout(()=>{
+    document.getElementById('phase-gesture').style.display='none';
+    document.getElementById('phase-pin').style.display='block';
+    running=false;
+  },3600);
+}
 
-  setTimeout(() => {
-    result.style.display = 'block';
-    result.style.borderColor = 'rgba(29,184,115,0.4)';
-    result.style.background = 'rgba(29,184,115,0.08)';
-    result.innerHTML = '<span style="color:#1DB873;font-weight:500">Gizli Panel Açıldı</span> · Dışarıdan gözlemleyen hiçbir iz göremedi';
-    dot.style.opacity = '0';
-    running = false;
-    btn.disabled = false;
-    btn.textContent = 'Tekrar Dene ↗';
-  }, 3400);
+function updatePinDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    d.className='pin-dot'+(i<pinVal.length?' filled':'');
+  }
+}
+
+function pinPress(ch){
+  if(pinVal.length>=4)return;
+  pinVal+=ch;updatePinDots();
+  if(pinVal.length===4)setTimeout(()=>checkPin(),200);
+}
+
+function pinClear(){pinVal=pinVal.slice(0,-1);updatePinDots();}
+
+function checkPin(){
+  if(pinVal===CORRECT_PIN){openFolder();}
+  else{
+    for(let i=0;i<4;i++)document.getElementById('pd'+i).className='pin-dot err';
+    const box=document.getElementById('pin-box');
+    box.style.animation='shake .4s ease';
+    setTimeout(()=>{
+      for(let i=0;i<4;i++)document.getElementById('pd'+i).className='pin-dot';
+      box.style.animation='';pinVal='';updatePinDots();
+    },800);
+  }
+}
+
+function fpStart(ev){
+  if(ev)ev.preventDefault();
+  if(fpHolding)return;
+  fpHolding=true;
+  const btn=document.getElementById('fp-btn');
+  const scan=document.getElementById('fp-scan');
+  const r1=document.getElementById('fp-ripple1');
+  const r2=document.getElementById('fp-ripple2');
+  const ring=document.getElementById('fp-ring');
+  const prog=document.getElementById('fp-progress');
+  const icon=document.getElementById('fp-icon');
+  btn.classList.add('scanning');
+  scan.style.display='block';
+  r1.style.display='block';r2.style.display='block';
+  ring.style.display='block';
+  icon.setAttribute('stroke','#1DB873');
+  prog.style.transition='none';prog.style.width='0%';
+  requestAnimationFrame(()=>{
+    prog.style.transition=`width ${HOLD_MS}ms linear`;
+    prog.style.width='100%';
+  });
+  fpTimer=setTimeout(()=>{
+    if(!fpHolding)return;
+    scan.style.display='none';
+    r1.style.display='none';r2.style.display='none';
+    ring.style.display='none';
+    icon.style.display='none';
+    btn.classList.remove('scanning');
+    btn.classList.add('success');
+    document.getElementById('fp-check').style.display='block';
+    setTimeout(()=>openFolder(),500);
+  },HOLD_MS);
+}
+
+function fpStop(){
+  if(!fpHolding)return;
+  fpHolding=false;
+  clearTimeout(fpTimer);
+  const btn=document.getElementById('fp-btn');
+  if(btn.classList.contains('success'))return;
+  btn.classList.remove('scanning');
+  document.getElementById('fp-scan').style.display='none';
+  document.getElementById('fp-ripple1').style.display='none';
+  document.getElementById('fp-ripple2').style.display='none';
+  document.getElementById('fp-ring').style.display='none';
+  const prog=document.getElementById('fp-progress');
+  prog.style.transition='none';prog.style.width='0%';
+  document.getElementById('fp-icon').setAttribute('stroke','#222');
+}
+
+function openFolder(){
+  document.getElementById('phase-pin').style.display='none';
+  document.getElementById('phase-folder').style.display='block';
+}
+
+function resetAll(){
+  pinVal='';fpHolding=false;clearTimeout(fpTimer);
+  document.getElementById('phase-folder').style.display='none';
+  document.getElementById('phase-gesture').style.display='block';
+  document.getElementById('phase-pin').style.display='none';
+  const btn=document.getElementById('demo-btn');
+  btn.disabled=false;btn.textContent='Tekrar Dene';btn.style.background='#1DB873';
+  document.getElementById('dtw-bar').style.width='0%';
+  document.getElementById('dtw-pct').textContent='0%';
+  document.getElementById('status-text').textContent='Demoyu başlatmak için butona bas';
+  setDot(1);updatePinDots();
+  document.getElementById('icon-grid').setAttribute('transform','translate(0,0)');
+  const path=document.getElementById('gpath');
+  path.style.transition='';path.style.strokeDashoffset='600';path.style.opacity='0';
+  const fpbtn=document.getElementById('fp-btn');
+  fpbtn.classList.remove('scanning','success');
+  document.getElementById('fp-icon').style.display='';
+  document.getElementById('fp-icon').setAttribute('stroke','#222');
+  document.getElementById('fp-check').style.display='none';
+  document.getElementById('fp-scan').style.display='none';
+  document.getElementById('fp-ripple1').style.display='none';
+  document.getElementById('fp-ripple2').style.display='none';
+  document.getElementById('fp-ring').style.display='none';
+  document.getElementById('fp-progress').style.width='0%';
 }
 </script>
+
