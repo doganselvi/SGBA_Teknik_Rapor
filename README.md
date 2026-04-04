@@ -1,6 +1,6 @@
 ## 🧪 Canlı Demo
 
-👉 [v4 Final Demo (Uçtan Uca Akış)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo_v4%20NEW.html)
+👉 [v4 Final Demo (Uçtan Uca Akış)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo.html )
 
 👉 [v2 UI Mockup (Gelişmiş Arayüz)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html )
 
