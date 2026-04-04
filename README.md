@@ -2,7 +2,7 @@
 
 👉 [v4 Final Demo (Uçtan Uca Akış)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo_v4%20NEW.html)
 
-👉 [v2 UI Mockup (Gelişmiş Arayüz)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html)
+👉 [v2 UI Mockup (Gelişmiş Arayüz)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup_v2.html)
 
 👉 [v2 Kayıt Sistemi (Gelişmiş Vektör)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_kayit_v2%20NEW.html)
 
