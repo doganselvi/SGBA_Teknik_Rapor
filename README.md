@@ -13,7 +13,7 @@
 
 👉 [Güvenlik Analizi](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_guvenlik_analizi.html)
 
-👉 [Kullanım Senaryoları](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html)
+👉 [v2 Kullanım Senaryoları](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html)
 
 # 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v2.9)
 
