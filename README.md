@@ -4,7 +4,7 @@
 
 
 ## 🧪 Canlı Demo
-
+https://github.com/doganselvi/SGBA_Teknik_Rapor/blob/main/s
 👉 [v4 Final Demo (Uçtan Uca Akış)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo.html )
 
 👉 [v2 UI Mockup (Gelişmiş Arayüz)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html )
