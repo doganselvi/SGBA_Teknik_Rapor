@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGBA – Use Cases ENG</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --surface: #0f0f1e;
+  --card: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.07);
+  --blue: #1428A0;
+  --green: #1DB873;
+  --red: #e74c3c;
+  --amber: #f39c12;
+  --white: #ffffff;
+  --gray: rgba(255,255,255,0.45);
+  --gray-dim: rgba(255,255,255,0.18);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  font-family: 'Montserrat', sans-serif;
+  min-height: 100vh;
+  padding: 32px 16px 48px;
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* BG GRID */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(20,40,160,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20,40,160,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+  position: relative;
+  z-index: 2;
+}
+.header-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--blue);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+.header h1 {
+  font-size: 28px;
+  font-weight: 200;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+.header p {
+  font-size: 13px;
+  color: var(--gray);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* TABS */
+.tab-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+.tab {
+  padding: 8px 18px;
+  border-radius: 3px;
+  border: 0.5px solid var(--border);
+  background: var(--card);
+  color: var(--gray);
+  font-size: 11px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-transform: uppercase;
+}
+.tab.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+  font-weight: 600;
+}
+.tab:hover:not(.active) {
+  border-color: rgba(20,40,160,0.5);
+  color: rgba(255,255,255,0.8);
+  background: rgba(20,40,160,0.08);
+}
+
+/* SCENARIO WRAPPER */
+.scenario { display: none; position: relative; z-index: 2; }
+.scenario.active { display: block; animation: fadeUp 0.4s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.scene-wrap {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  max-width: 820px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── PHONE ── */
+.phone-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.phone-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--gray-dim); letter-spacing: 2px; text-transform: uppercase; }
+
+.phone {
+  width: 200px;
+  background: #0a0a12;
+  border-radius: 40px;
+  padding: 14px 10px 18px;
+  border: 1.5px solid #1e1e2e;
+  position: relative;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.phone::before {
+  content: '';
+  position: absolute;
+  right: -3px; top: 72px;
+  width: 3px; height: 28px;
+  background: #1a1a2a; border-radius: 0 2px 2px 0;
+}
+.phone::after {
+  content: '';
+  position: absolute;
+  right: -3px; top: 110px;
+  width: 3px; height: 20px;
+  background: #1a1a2a; border-radius: 0 2px 2px 0;
+}
+.notch { width: 56px; height: 10px; background: #111120; border-radius: 6px; margin: 0 auto 10px; }
+
+.screen {
+  background: #13132a;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 0.5px solid rgba(255,255,255,0.04);
+}
+.status-bar {
+  display: flex; justify-content: space-between;
+  padding: 7px 14px 4px;
+  font-size: 8.5px; color: rgba(255,255,255,0.5);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* App grids */
+.app-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 6px; padding: 10px 8px;
+}
+.app-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.app-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.app-name { font-size: 6px; color: rgba(255,255,255,0.55); text-align: center; }
+
+/* Dock */
+.dock {
+  display: flex; justify-content: center; gap: 8px;
+  padding: 8px 12px;
+  border-top: 0.5px solid rgba(255,255,255,0.05);
+  margin-top: 4px;
+}
+.dock-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+
+/* Screen content types */
+.screen-section { padding: 10px 10px 6px; }
+.screen-title { font-size: 8px; color: rgba(255,255,255,0.3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+
+.info-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 0; border-bottom: 0.5px solid rgba(255,255,255,0.05);
+}
+.info-key { font-size: 8.5px; color: rgba(255,255,255,0.45); }
+.info-val { font-size: 8.5px; font-weight: 600; }
+.info-val.green { color: var(--green); }
+.info-val.red { color: var(--red); }
+.info-val.amber { color: var(--amber); }
+
+.alert-box {
+  background: rgba(231,76,60,0.1); border: 0.5px solid rgba(231,76,60,0.25);
+  border-radius: 7px; padding: 7px 8px; margin-bottom: 8px;
+  font-size: 7.5px; color: rgba(231,76,60,0.9); text-align: center; line-height: 1.5;
+}
+.success-box {
+  background: rgba(29,184,115,0.1); border: 0.5px solid rgba(29,184,115,0.25);
+  border-radius: 7px; padding: 7px 8px; margin-bottom: 8px;
+  font-size: 7.5px; color: rgba(29,184,115,0.9); text-align: center; line-height: 1.5;
+}
+
+/* Secret panel */
+.secret-panel { padding: 12px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.sp-header { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.sp-lock { width: 32px; height: 32px; border-radius: 50%; background: rgba(29,184,115,0.15); border: 1px solid rgba(29,184,115,0.35); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.sp-title { font-size: 9px; font-weight: 600; color: #fff; letter-spacing: 1px; }
+.sp-sub { font-size: 7px; color: rgba(255,255,255,0.3); font-family: 'JetBrains Mono', monospace; }
+.sp-apps { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; width: 100%; }
+.sp-app { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.sp-app-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.sp-app-name { font-size: 6.5px; color: rgba(255,255,255,0.5); }
+
+/* Notification screen */
+.notif-list { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.notif-item {
+  background: rgba(255,255,255,0.04); border-radius: 8px;
+  padding: 7px 9px; display: flex; align-items: center; gap: 7px;
+}
+.notif-app { font-size: 12px; }
+.notif-text { font-size: 7px; color: rgba(255,255,255,0.6); line-height: 1.4; }
+.notif-text b { color: rgba(255,255,255,0.9); }
+.notif-time { font-size: 6.5px; color: rgba(255,255,255,0.25); margin-left: auto; white-space: nowrap; }
+
+/* ── SCENE TEXT ── */
+.scene-text { flex: 1; min-width: 260px; max-width: 420px; }
+
+.persona { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); }
+.persona-name { font-size: 15px; font-weight: 600; color: #fff; letter-spacing: 0.5px; }
+.persona-role { font-size: 11px; color: rgba(255,255,255,0.38); margin-top: 3px; font-weight: 300; }
+
+.badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; padding: 4px 10px; border-radius: 2px; letter-spacing: 0.5px;
+}
+.badge.threat { background: rgba(231,76,60,0.12); border: 0.5px solid rgba(231,76,60,0.3); color: var(--red); }
+.badge.solution { background: rgba(29,184,115,0.1); border: 0.5px solid rgba(29,184,115,0.3); color: var(--green); }
+.badge.neutral { background: rgba(20,40,160,0.12); border: 0.5px solid rgba(20,40,160,0.4); color: #6080ff; }
+
+.story {
+  font-size: 12.5px; color: rgba(255,255,255,0.6); line-height: 1.85;
+  margin-bottom: 12px; font-weight: 300;
+}
+.story b { color: rgba(255,255,255,0.92); font-weight: 500; }
+.story em { color: var(--green); font-style: normal; }
+
+.divider { height: 0.5px; background: var(--border); margin: 14px 0; }
+
+.benefit-title { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 2px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
+.benefit-list { display: flex; flex-direction: column; gap: 8px; }
+.benefit { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 300; line-height: 1.5; }
+.benefit-check { color: var(--green); font-size: 11px; flex-shrink: 0; margin-top: 2px; font-weight: 700; }
+
+/* Stats row */
+.stats-row { display: flex; gap: 8px; margin-top: 16px; }
+.stat-pill {
+  flex: 1; background: var(--card); border: 0.5px solid var(--border);
+  border-radius: 6px; padding: 10px 8px; text-align: center;
+}
+.stat-num { font-size: 18px; font-weight: 200; color: var(--white); letter-spacing: 1px; }
+.stat-lbl { font-size: 8px; color: var(--gray-dim); letter-spacing: 1.5px; font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+/* Timeline */
+.timeline { display: flex; flex-direction: column; gap: 0; margin: 12px 0; }
+.tl-item { display: flex; gap: 12px; align-items: flex-start; }
+.tl-left { display: flex; flex-direction: column; align-items: center; }
+.tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); flex-shrink: 0; margin-top: 4px; }
+.tl-dot.green { background: var(--green); }
+.tl-dot.red { background: var(--red); }
+.tl-line { width: 1px; flex: 1; background: var(--border); min-height: 18px; }
+.tl-text { font-size: 11.5px; color: rgba(255,255,255,0.55); font-weight: 300; padding-bottom: 14px; line-height: 1.5; }
+.tl-text b { color: rgba(255,255,255,0.88); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-tag">// Real Life Situations</span>
+  <h1>Use Cases</h1>
+  <p>Who is SGBA for, against which threats, and what does it provide?</p>
+</div>
+
+<div class="tab-row">
+  <button class="tab active" onclick="showScene('journalist', this)">Journalist</button>
+  <button class="tab" onclick="showScene('parent', this)">Parent</button>
+  <button class="tab" onclick="showScene('byod', this)">Enterprise</button>
+  <button class="tab" onclick="showScene('activist', this)">Activist</button>
+  <button class="tab" onclick="showScene('traveler', this)">Travel</button>
+</div>
+
+<!-- ── JOURNALIST ── -->
+<div class="scenario active" id="sc-journalist">
+  <div class="scene-wrap">
+    <div class="phone-wrap">
+      <div class="phone-label">Checkpoint · official inspecting</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="status-bar"><span>09:41</span><span>●●● 4G</span></div>
+          <div class="screen-section">
+            <div class="alert-box">⚠ Device Inspection Active<br>Being inspected by official</div>
+            <div class="screen-title">System Status</div>
+            <div class="info-row"><span class="info-key">Secure Folder</span><span class="info-val green">Invisible ✓</span></div>
+            <div class="info-row"><span class="info-key">Hidden App</span><span class="info-val green">Not Detected ✓</span></div>
+            <div class="info-row"><span class="info-key">Sensitive File</span><span class="info-val green">Encrypted ✓</span></div>
+            <div class="info-row"><span class="info-key">SGBA Trace</span><span class="info-val green">Zero ✓</span></div>
+            <div class="info-row"><span class="info-key">Appearance</span><span class="info-val green">Normal Phone</span></div>
+          </div>
+          <div class="app-grid" style="padding-top:4px">
+            <div class="app-item"><div class="app-icon" style="background:#1a73e8">📞</div><div class="app-name">Phone</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#34a853">📷</div><div class="app-name">Camera</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#ea4335">🗺️</div><div class="app-name">Maps</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#607d8b">⚙️</div><div class="app-name">Settings</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-text">
+      <div class="persona">
+        <div class="avatar" style="background:rgba(231,76,60,0.1)">📰</div>
+        <div>
+          <div class="persona-name">Ayşe Kaya</div>
+          <div class="persona-role">Investigative Journalist · Field Reporter</div>
+        </div>
+      </div>
+      <div class="badge-row">
+        <span class="badge threat">Risk: Device Confiscation</span>
+        <span class="badge solution">SGBA: Zero Trace</span>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
+          <div class="tl-text">Reporting from a region under pressure. The phone contains <b>source identities, audio recordings, encrypted documents</b>.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
+          <div class="tl-text">Stopped at a checkpoint. The official <b>wants to inspect the phone.</b></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div><div class="tl-line"></div></div>
+          <div class="tl-text">The screen shows <b>a normal phone</b>. No Secure Folder icon, no suspicious app. SGBA is completely invisible.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div></div>
+          <div class="tl-text"><b>Source identities, documents and communications</b> were protected. Phone returned.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="benefit-title">Protection Provided</div>
+      <div class="benefit-list">
+        <div class="benefit"><span class="benefit-check">✓</span>Source identity and communication history are protected</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Even the existence of the security app cannot be detected</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Sensitive documents are hidden with Knox encryption</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Zero clues in forced unlock attempts</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-pill"><div class="stat-num">%0</div><div class="stat-lbl">Visual Trace</div></div>
+        <div class="stat-pill"><div class="stat-num">Knox</div><div class="stat-lbl">Encryption</div></div>
+        <div class="stat-pill"><div class="stat-num">∞</div><div class="stat-lbl">Source Prot.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── EBEVEYN ── -->
+<div class="scenario" id="sc-parent">
+  <div class="scene-wrap">
+    <div class="phone-wrap">
+      <div class="phone-label">Phone given to child · no hidden section</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="status-bar"><span>09:41</span><span>●●● 5G</span></div>
+          <div class="app-grid">
+            <div class="app-item"><div class="app-icon" style="background:#1a73e8">📞</div><div class="app-name">Phone</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#34a853">🎮</div><div class="app-name">Game</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#ea4335">📷</div><div class="app-name">Camera</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#fbbc04">🎵</div><div class="app-name">Music</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#9c27b0">📺</div><div class="app-name">YouTube</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#ff5722">🌐</div><div class="app-name">Browser</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#009688">🎨</div><div class="app-name">Drawing</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#607d8b">📚</div><div class="app-name">Education</div></div>
+          </div>
+          <div style="padding:6px 10px;font-size:6.5px;color:rgba(255,255,255,0.2);text-align:center;border-top:0.5px solid rgba(255,255,255,0.04);font-family:'JetBrains Mono',monospace;letter-spacing:0.5px">
+            Bank · Work Apps · Personal Notes → fully hidden
+          </div>
+          <div class="dock">
+            <div class="dock-icon" style="background:#1a73e8">📞</div>
+            <div class="dock-icon" style="background:#34a853">💬</div>
+            <div class="dock-icon" style="background:#ea4335">📷</div>
+            <div class="dock-icon" style="background:#fbbc04">🎮</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-text">
+      <div class="persona">
+        <div class="avatar" style="background:rgba(52,168,83,0.1)">👨‍👩‍👧</div>
+        <div>
+          <div class="persona-name">Mehmet Yılmaz</div>
+          <div class="persona-role">Freelance Accountant · Father of Two</div>
+        </div>
+      </div>
+      <div class="badge-row">
+        <span class="badge threat">Risk: Child Access</span>
+        <span class="badge solution">SGBA: Parental Shield</span>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+          <div class="tl-text">His 8-year-old son wants the phone to play games. The phone has <b>client data, banking app, tax documents</b>.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div><div class="tl-line"></div></div>
+          <div class="tl-text">Hands over the phone. The child opens it — sees <b>only games and kid-friendly content</b>. No banking app, no work files.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div></div>
+          <div class="tl-text">The child never even became aware of <b>the hidden section's existence.</b> Mehmet never had to offer any explanation.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="benefit-title">Protection Provided</div>
+      <div class="benefit-list">
+        <div class="benefit"><span class="benefit-check">✓</span>Child access to financial apps and data is blocked</div>
+        <div class="benefit"><span class="benefit-check">✓</span>The existence of the hidden section is never felt by the child</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Parent behaves naturally, makes no explanation</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Client data and personal communications are protected</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BYOD ── -->
+<div class="scenario" id="sc-byod">
+  <div class="scene-wrap">
+    <div class="phone-wrap">
+      <div class="phone-label">Corporate panel · Knox MDM active</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="status-bar"><span>09:41</span><span>●●● WiFi</span></div>
+          <div class="secret-panel">
+            <div class="sp-header">
+              <div class="sp-lock">💼</div>
+              <div class="sp-title">Corporate Zone</div>
+              <div class="sp-sub">Knox MDM · AES-256 Encrypted</div>
+            </div>
+            <div class="sp-apps">
+              <div class="sp-app"><div class="sp-app-icon" style="background:rgba(0,120,212,0.2)">📊</div><div class="sp-app-name">Teams</div></div>
+              <div class="sp-app"><div class="sp-app-icon" style="background:rgba(214,40,40,0.2)">📧</div><div class="sp-app-name">Outlook</div></div>
+              <div class="sp-app"><div class="sp-app-icon" style="background:rgba(33,150,243,0.2)">🔒</div><div class="sp-app-name">VPN</div></div>
+              <div class="sp-app"><div class="sp-app-icon" style="background:rgba(29,184,115,0.2)">📁</div><div class="sp-app-name">SharePnt</div></div>
+              <div class="sp-app"><div class="sp-app-icon" style="background:rgba(156,39,176,0.2)">🔐</div><div class="sp-app-name">2FA</div></div>
+              <div class="sp-app"><div class="sp-app-icon" style="background:rgba(255,152,0,0.2)">📋</div><div class="sp-app-name">Jira</div></div>
+            </div>
+            <div style="font-size:6.5px;color:rgba(255,255,255,0.2);text-align:center;font-family:'JetBrains Mono',monospace">IT control active · policies applied</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-text">
+      <div class="persona">
+        <div class="avatar" style="background:rgba(20,40,160,0.15)">💼</div>
+        <div>
+          <div class="persona-name">Elif Arslan</div>
+          <div class="persona-role">Senior Software Developer · BYOD Policy</div>
+        </div>
+      </div>
+      <div class="badge-row">
+        <span class="badge threat">Risk: Data Leak</span>
+        <span class="badge solution">SGBA + Knox MDM</span>
+        <span class="badge neutral">Enterprise</span>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+          <div class="tl-text">Company BYOD policy requires <b>corporate apps to be isolated from the personal space</b>.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div><div class="tl-line"></div></div>
+          <div class="tl-text">SGBA + Knox Workspace integration: corporate zone is <b>completely separate, invisible and encrypted.</b> IT policies apply only to this zone.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div></div>
+          <div class="tl-text"><b>Personal space remains untouched.</b> Company data isolated, employee privacy protected.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="benefit-title">Protection Provided</div>
+      <div class="benefit-list">
+        <div class="benefit"><span class="benefit-check">✓</span>Full isolation between work and personal data</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Knox MDM supports corporate policies</div>
+        <div class="benefit"><span class="benefit-check">✓</span>IT department cannot access employee personal data</div>
+        <div class="benefit"><span class="benefit-check">✓</span>AES-256 encryption + biometric lock</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ACTIVIST ── -->
+<div class="scenario" id="sc-activist">
+  <div class="scene-wrap">
+    <div class="phone-wrap">
+      <div class="phone-label">Protest area · detention risk</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="status-bar"><span>09:41</span><span>●●● LTE</span></div>
+          <div class="screen-section">
+            <div class="success-box">✓ SGBA Active · Hidden Panel Locked<br>External access impossible</div>
+            <div class="screen-title">Current Status</div>
+            <div class="info-row"><span class="info-key">Location History</span><span class="info-val green">Hidden ✓</span></div>
+            <div class="info-row"><span class="info-key">Messaging Log</span><span class="info-val green">Encrypted ✓</span></div>
+            <div class="info-row"><span class="info-key">Contacts</span><span class="info-val green">Protected ✓</span></div>
+            <div class="info-row"><span class="info-key">Brute Force</span><span class="info-val green">Blocked ✓</span></div>
+          </div>
+          <div class="app-grid" style="padding-top:2px">
+            <div class="app-item"><div class="app-icon" style="background:#1a73e8">📞</div><div class="app-name">Phone</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#34a853">📷</div><div class="app-name">Camera</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#ea4335">🗺️</div><div class="app-name">Maps</div></div>
+            <div class="app-item"><div class="app-icon" style="background:#607d8b">⚙️</div><div class="app-name">Settings</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-text">
+      <div class="persona">
+        <div class="avatar" style="background:rgba(243,156,18,0.1)">✊</div>
+        <div>
+          <div class="persona-name">Kerem Demir</div>
+          <div class="persona-role">Human Rights Advocate · NGO Volunteer</div>
+        </div>
+      </div>
+      <div class="badge-row">
+        <span class="badge threat">Risk: Detention · Forced Access</span>
+        <span class="badge solution">SGBA: Digital Protection</span>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
+          <div class="tl-text">At the protest site. Phone contains <b>organization members' contact info, meeting notes, documented evidence</b>.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
+          <div class="tl-text">In case of detention, authorities are expected to attempt <b>forced access</b> to the phone.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div><div class="tl-line"></div></div>
+          <div class="tl-text">SGBA + Knox encryption active. <b>Zero feedback on failed attempts</b> — the attacker cannot know what they are looking at.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div></div>
+          <div class="tl-text"><b>All member data and organization info</b> was protected. No one was exposed.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="benefit-title">Protection Provided</div>
+      <div class="benefit-list">
+        <div class="benefit"><span class="benefit-check">✓</span>Member identities and communication network remain hidden</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Zero clues in forced decryption attempts</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Location history and message logs are encrypted</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Vector space protection against brute force attacks</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SEYAHAT ── -->
+<div class="scenario" id="sc-traveler">
+  <div class="scene-wrap">
+    <div class="phone-wrap">
+      <div class="phone-label">Border crossing · customs inspection</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="status-bar"><span>09:41</span><span>●●● WiFi</span></div>
+          <div class="notif-list">
+            <div style="padding:6px 8px;font-size:7px;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace;letter-spacing:1px">NOTIFICATIONS</div>
+            <div class="notif-item">
+              <span class="notif-app">✈️</span>
+              <div class="notif-text"><b>Turkish Airlines</b><br>Istanbul → Berlin boarding started</div>
+              <span class="notif-time">9:38</span>
+            </div>
+            <div class="notif-item">
+              <span class="notif-app">🗺️</span>
+              <div class="notif-text"><b>Google Maps</b><br>Airport terminal in 8 min.</div>
+              <span class="notif-time">9:35</span>
+            </div>
+            <div class="notif-item">
+              <span class="notif-app">💬</span>
+              <div class="notif-text"><b>Messages</b><br>Mom: Have a great trip!</div>
+              <span class="notif-time">9:30</span>
+            </div>
+          </div>
+          <div class="screen-section" style="padding-top:6px">
+            <div class="info-row"><span class="info-key">Work Files</span><span class="info-val green">Hidden ✓</span></div>
+            <div class="info-row"><span class="info-key">Corporate VPN</span><span class="info-val green">Protected ✓</span></div>
+            <div class="info-row"><span class="info-key">Customs Scan</span><span class="info-val green">Temiz Appearance</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-text">
+      <div class="persona">
+        <div class="avatar" style="background:rgba(0,150,136,0.1)">🌍</div>
+        <div>
+          <div class="persona-name">Selin Öztürk</div>
+          <div class="persona-role">International Project Manager · Frequent Traveler</div>
+        </div>
+      </div>
+      <div class="badge-row">
+        <span class="badge threat">Risk: Border Control</span>
+        <span class="badge solution">SGBA: Clean Appearance</span>
+        <span class="badge neutral">Travel</span>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+          <div class="tl-text">Making a transit through a high-risk country. Phone contains <b>negotiation documents, partner communications, confidential project files</b>.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
+          <div class="tl-text">Customs requests a phone inspection. In some countries <b>device cloning</b> is practiced.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div><div class="tl-line"></div></div>
+          <div class="tl-text">Screen shows <b>flight info, maps and family messages</b> — completely innocent appearance. Corporate data invisible.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot green"></div></div>
+          <div class="tl-text"><b>Phone was returned.</b> Confidential project files could not be cloned, business partners protected.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="benefit-title">Protection Provided</div>
+      <div class="benefit-list">
+        <div class="benefit"><span class="benefit-check">✓</span>Corporate documents and work communications are hidden</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Even if device is cloned at border, hidden zone is unreachable</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Innocent appearance raises no suspicion</div>
+        <div class="benefit"><span class="benefit-check">✓</span>Business partners and partner identities are protected</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-pill"><div class="stat-num">127</div><div class="stat-lbl">Country Risk</div></div>
+        <div class="stat-pill"><div class="stat-num">%0</div><div class="stat-lbl">Data Leak</div></div>
+        <div class="stat-pill"><div class="stat-num">AES</div><div class="stat-lbl">Encryption</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showScene(id, el) {
+  document.querySelectorAll('.scenario').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sc-' + id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
