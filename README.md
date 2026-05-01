@@ -1,125 +1,115 @@
-# 🌐 SGBA Live Experience
+## 🧪 Live Demos
 
-👉 [Visit Official Website](https://invisibleshield-v2.netlify.app/) 
+👉 [v4 Final Demo (End-to-End Flow)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo.html) | [EN](https://github.com/doganselvi/SGBA_Teknik_Rapor/blob/main/sgba_gesture_demo_v4_NEW_eng.html)
 
+👉 [v2 UI Mockup (Advanced Interface)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html) | [EN](https://github.com/doganselvi/SGBA_Teknik_Rapor/blob/main/sgba_ui_mockup_v2_eng.html)
 
-## 🧪 Canlı Demo
+👉 [v2 Registration System (Advanced Vector)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_kayit_v2%20NEW.html) | [EN](https://github.com/doganselvi/SGBA_Teknik_Rapor/blob/main/SGBA___Gesture_Registration__EN_.html)
 
-👉 [v4 Final Demo (Uçtan Uca Akış)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo.html )
+👉 [Security Analysis](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_guvenlik_analizi.html) | [EN](https://github.com/doganselvi/SGBA_Teknik_Rapor/blob/main/Writing_sgba_security_analysis_eng_html.html)
 
-👉 [v2 UI Mockup (Gelişmiş Arayüz)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html )
-
-👉 [v2 Kayıt Sistemi (Gelişmiş Vektör)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_kayit_v2%20NEW.html)
-
-👉 [Güvenlik Analizi](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_guvenlik_analizi.html)
-
-👉 [v2 Kullanım Senaryoları](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html)
+👉 [v2 Use Cases](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html) | [EN](https://github.com/doganselvi/SGBA_Teknik_Rapor/blob/main/sgba_use_cases_eng.html)
 
 # 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v2.9)
 
-SGBA (Zero-Visual Trace Security Algorithm), mobil cihazlarda gizli katmanlara erişimi **hiçbir görsel iz bırakmadan** sağlayan, gesture tabanlı ve davranış analizli yeni nesil bir güvenlik yaklaşımıdır.
+SGBA (Zero-Visual Trace Security Algorithm) is a next-generation, gesture-based and behavior-analysis-driven security approach that enables access to hidden layers on mobile devices **without leaving any visual trace**.
 
 ---
 
-## 🚀 Proje Vizyonu
+## 🚀 Project Vision
 
-Geleneksel güvenlik çözümleri (ör. gizli klasörler), her zaman bir **iz** bırakır:
-- ikon
-- kilit ekranı
-- erişim ipuçları
+Traditional security solutions (e.g. hidden folders) always leave a **trace**:
+- icon
+- lock screen
+- access hints
 
-SGBA ise bu izleri tamamen ortadan kaldırır.
+SGBA eliminates all of these traces entirely.
 
-> Cihaz dışarıdan bakıldığında tamamen normal görünür.  
-> Sadece kullanıcıya özel bir gesture ile gizli katman tetiklenir.
-
----
-
-## 🧠 Temel Yaklaşım
-
-SGBA, kullanıcıya özel dokunma davranışını analiz eder ve doğrular:
-
-- Zamanlama
-- Hareket şekli
-- Hız
-- Basınç (genişletilebilir)
-
-Bu sayede sistem:
-- rastgele dokunuşları reddeder  
-- sadece gerçek kullanıcıyı tanır  
+> From the outside, the device looks completely normal.  
+> The hidden layer is triggered only by the user's own gesture.
 
 ---
 
-## 🛠️ Teknik Özellikler
+## 🧠 Core Approach
 
-### 🔹 Algoritma
-- **DTW (Dynamic Time Warping)** tabanlı gesture doğrulama
-- Vektörleştirilmiş hareket karşılaştırma
+SGBA analyzes and verifies user-specific touch behavior:
 
-### 🔹 AI & Optimizasyon
-- NPU (Neural Processing Unit) üzerinde çalışacak şekilde tasarım
-- Event-driven tetikleme (sadece gerekli anda aktif)
-- Ultra düşük güç tüketimi
+- Timing
+- Movement pattern
+- Speed
+- Pressure (extensible)
 
-### 🔹 Güvenlik Katmanları
-- Hız filtresi → kazara dokunuşları engeller  
-- Proximity Sensor → cep içi tetiklemeyi önler  
-- Feedback suppression → brute-force denemeleri zorlaştırır  
+This allows the system to:
+- reject random touches
+- recognize only the real user
 
 ---
 
-## 🧪 Güvenlik Analizi
+## 🛠️ Technical Specifications
 
-SGBA aşağıdaki saldırı türlerine karşı test edilmiştir:
+### 🔹 Algorithm
+- **DTW (Dynamic Time Warping)** based gesture verification
+- Vectorized movement comparison
 
-- ❌ Brute Force → geri bildirim yok → öğrenme engellenir  
-- ❌ Shoulder Surfing → görsel iz yok → gözle takip edilemez  
-- ❌ Accidental Trigger → sensör + hız filtresi ile engellenir  
+### 🔹 AI & Optimization
+- Designed to run on the NPU (Neural Processing Unit)
+- Event-driven triggering (active only when needed)
+- Ultra-low power consumption
+
+### 🔹 Security Layers
+- Speed filter → blocks accidental touches
+- Proximity Sensor → prevents in-pocket triggering
+- Feedback suppression → makes brute-force attempts harder
 
 ---
 
-## 🧩 Demo & Simülasyonlar
+## 🧪 Security Analysis
+
+SGBA has been tested against the following attack types:
+
+- ❌ Brute Force → no feedback → learning is blocked
+- ❌ Shoulder Surfing → no visual trace → cannot be visually tracked
+- ❌ Accidental Trigger → blocked by sensor + speed filter
+
+---
+
+## 🧩 Demos & Simulations
 
 - `sgba_gesture_kayit.html`  
-  → Gesture kayıt ve doğrulama süreci  
+  → Gesture recording and verification process
 
 - `sgba_guvenlik_analizi.html`  
-  → Saldırı simülasyonları  
+  → Attack simulations
 
 - `sgba_kullanim_senaryolari.html`  
-  → Gerçek kullanım senaryoları  
+  → Real-world usage scenarios
 
 - `SGBA_Konsept_Demo_v2.9.pdf`  
-  → Matematiksel ve sistem mimarisi  
+  → Mathematical foundations and system architecture
 
 ---
 
-## 🌍 Kullanım Alanları
+## 🌍 Use Cases
 
-- 📰 Gazetecilik & Aktivizm  
-- 👨‍👩‍👧‍👦 Ebeveyn gizlilik ihtiyaçları  
-- 🏢 Kurumsal BYOD politikaları  
-- 🔐 Yüksek gizlilik gerektiren bireysel kullanım  
-
----
-
-## 🔮 Gelecek Geliştirmeler
-
-- Gerçek cihaz entegrasyonu (Android / One UI)
-- Sensör verisi genişletme (gyroscope, pressure)
-- AI model iyileştirmeleri
-- Performans ölçümleri
+- 📰 Journalism & Activism
+- 👨‍👩‍👧‍👦 Parental privacy needs
+- 🏢 Corporate BYOD policies
+- 🔐 High-privacy individual use
 
 ---
 
-## 👨‍💻 Geliştirici
 
-Bu proje, Ankara'da teknik eğitimine devam eden,  
-Elektrik-Elektronik Mühendisliği hedefi olan bir 11. sınıf ATP öğrencisi tarafından geliştirilmiştir.
 
 ---
 
-## 📌 Not
+## 👨‍💻 Developer
 
-Bu proje bir **konsept ve prototip çalışmasıdır**.  
-Amaç, mevcut mobil güvenlik yaklaşımlarına alternatif bir model sunmaktır.
+This project was developed by an 11th-grade ATP student based in Ankara,  
+pursuing a degree in Electrical & Electronics Engineering.
+
+---
+
+## 📌 Note
+
+This project is a **concept and prototype study**.  
+Its goal is to present an alternative model to existing mobile security approaches.
