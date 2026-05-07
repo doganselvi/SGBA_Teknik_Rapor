@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SGBA – Security Analysis</title>
+<title>SGBA – Güvenlik Analizi</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -59,6 +59,7 @@
   /* ── BRUTE FORCE ── */
   .bf-scene { display: flex; gap: 16px; align-items: flex-start; }
 
+  /* Mini telefon */
   .bf-phone-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .bf-phone {
     width: 80px;
@@ -81,6 +82,7 @@
   }
   .bf-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
+  /* sağ panel: attempt log */
   .bf-right { flex: 1; display: flex; flex-direction: column; gap: 6px; }
   .bf-log {
     height: 116px;
@@ -157,6 +159,7 @@
   .chevron { font-size: 12px; color: rgba(0,140,255,0.4); margin-left: auto; transition: transform 0.2s; }
   .chevron.open { transform: rotate(180deg); }
 
+  /* scan line overlay */
   .bf-screen::after {
     content:'';
     position:absolute; top:0; left:0; right:0; bottom:0;
@@ -167,8 +170,8 @@
 </head>
 <body>
 
-<h2>SGBA — Security Analysis</h2>
-<div class="subtitle">Possible attack vectors and SGBA's defense mechanisms</div>
+<h2>SGBA — Güvenlik Analizi</h2>
+<div class="subtitle">Olası saldırı vektörleri ve SGBA'nın savunma mekanizmaları</div>
 
 <div class="attacks">
 
@@ -177,28 +180,28 @@
     <div class="attack-header" onclick="toggle('bf')">
       <div class="attack-icon" style="background:rgba(231,76,60,0.12)">🔓</div>
       <div>
-        <div class="attack-title">Brute Force Attack</div>
-        <div class="attack-sub">Attempting to crack by trying all combinations</div>
+        <div class="attack-title">Brute Force (Kaba Kuvvet)</div>
+        <div class="attack-sub">Tüm kombinasyonları deneyerek kırma girişimi</div>
       </div>
-      <div class="risk-badge risk-low">Very Low Risk</div>
+      <div class="risk-badge risk-low">Çok Düşük Risk</div>
       <div class="chevron open" id="chev-bf">▼</div>
     </div>
     <div class="attack-body" id="body-bf">
       <div class="vs-row">
         <div class="vs-box vs-bad">
-          <div class="vs-label">Classic PIN / Password</div>
-          <div class="vs-text">10,000 combinations (4 digits). Visual error feedback. Attacker can track progress.</div>
+          <div class="vs-label">Klasik PIN/Şifre</div>
+          <div class="vs-text">10.000 kombinasyon (4 hane). Deneme hatası görsel. Saldırgan ilerlemeyi takip eder.</div>
         </div>
         <div class="vs-box vs-good">
           <div class="vs-label">SGBA Gesture</div>
-          <div class="vs-text">Free vector space = astronomical combinations. Zero feedback on wrong attempt. Attacker has no idea where they stand.</div>
+          <div class="vs-text">Serbest vektör uzayı = astronomik kombinasyon. Yanlış denemede sıfır geri bildirim. Saldırgan nerede olduğunu bilemez.</div>
         </div>
       </div>
       <div class="demo-wrap">
-        <div class="demo-title">⚔️ Simulation — Real-Time Attack</div>
+        <div class="demo-title">⚔️ Simülasyon — Gerçek Zamanlı Saldırı</div>
         <div class="bf-scene">
 
-          <!-- Phone -->
+          <!-- Telefon -->
           <div class="bf-phone-wrap">
             <div class="bf-phone">
               <div class="bf-notch"></div>
@@ -206,18 +209,18 @@
                 <canvas class="bf-canvas" id="bf-canvas"></canvas>
               </div>
             </div>
-            <div style="font-size:8px;color:rgba(255,100,100,0.6);text-align:center;margin-top:2px" id="bf-phone-status">Waiting</div>
+            <div style="font-size:8px;color:rgba(255,100,100,0.6);text-align:center;margin-top:2px" id="bf-phone-status">Bekleniyor</div>
           </div>
 
-          <!-- Log panel -->
+          <!-- Log paneli -->
           <div class="bf-right">
             <div class="bf-log" id="bf-log">
-              <div style="font-size:9px;color:rgba(100,160,255,0.3);font-style:italic;padding:4px">Click the button to start the simulation…</div>
+              <div style="font-size:9px;color:rgba(100,160,255,0.3);font-style:italic;padding:4px">Simülasyonu başlatmak için butona tıkla…</div>
             </div>
-            <div class="bf-counter" id="bf-counter">Attempts: <b>0</b> · Result: <b style="color:#ff6b6b">—</b></div>
+            <div class="bf-counter" id="bf-counter">Deneme: <b>0</b> · Sonuç: <b style="color:#ff6b6b">—</b></div>
           </div>
         </div>
-        <button class="sim-btn" id="bf-btn" onclick="startBF()">▶ Start Attack</button>
+        <button class="sim-btn" id="bf-btn" onclick="startBF()">▶ Saldırıyı Başlat</button>
       </div>
     </div>
   </div>
@@ -227,25 +230,25 @@
     <div class="attack-header" onclick="toggle('ss')">
       <div class="attack-icon" style="background:rgba(243,156,18,0.12)">👁️</div>
       <div>
-        <div class="attack-title">Shoulder Surfing</div>
-        <div class="attack-sub">Learning the gesture by watching the user</div>
+        <div class="attack-title">Shoulder Surfing (Omuz Sörfü)</div>
+        <div class="attack-sub">Kullanıcıyı izleyerek hareketi öğrenme</div>
       </div>
-      <div class="risk-badge risk-mid">Medium Risk</div>
+      <div class="risk-badge risk-mid">Orta Risk</div>
       <div class="chevron open" id="chev-ss">▼</div>
     </div>
     <div class="attack-body" id="body-ss">
       <div class="vs-row">
         <div class="vs-box vs-bad">
-          <div class="vs-label">Classic Method</div>
-          <div class="vs-text">Visual trail on screen. Someone watching from behind can clearly see the pattern. A single observation is enough.</div>
+          <div class="vs-label">Klasik Yöntem</div>
+          <div class="vs-text">Ekranda görsel iz. Arkadan bakan kişi şekli net görür. Tek seferlik gözlem yeterli.</div>
         </div>
         <div class="vs-box vs-good">
           <div class="vs-label">SGBA</div>
-          <div class="vs-text">Zero trail on screen. Only finger movement can be observed. Knox biometric 2nd layer can be added.</div>
+          <div class="vs-text">Ekranda sıfır iz. Sadece parmak hareketi izlenebilir. Knox biyometrik 2. katman eklenebilir.</div>
         </div>
       </div>
       <div class="demo-wrap">
-        <div class="demo-title">Scenario — What does the observer see?</div>
+        <div class="demo-title">Senaryo — Gözlemci ne görüyor?</div>
         <div class="ss-scene">
           <div class="ss-phone">
             <div class="ss-notch"></div>
@@ -255,13 +258,13 @@
           </div>
           <div class="eye-indicator">
             <div class="eye-ring danger" id="eye-ring">👁️</div>
-            <div class="eye-text danger" id="eye-text">Visible</div>
+            <div class="eye-text danger" id="eye-text">Görüyor</div>
           </div>
-          <div class="ss-desc" id="ss-desc">Classic Secure Folder: the observer clearly sees the icon and asks "what are you hiding?"</div>
+          <div class="ss-desc" id="ss-desc">Klasik Güvenli Klasör: gözlemci simgeyi net görüyor ve "ne saklıyorsun?" diye soruyor.</div>
         </div>
         <div class="ss-toggle">
-          <button class="ss-btn red-btn active" id="ss-btn-bad" onclick="ssSwitch('bad')">Classic Method</button>
-          <button class="ss-btn green-btn" id="ss-btn-good" onclick="ssSwitch('good')">With SGBA</button>
+          <button class="ss-btn red-btn active" id="ss-btn-bad" onclick="ssSwitch('bad')">Klasik Yöntem</button>
+          <button class="ss-btn green-btn" id="ss-btn-good" onclick="ssSwitch('good')">SGBA ile</button>
         </div>
       </div>
     </div>
@@ -272,39 +275,39 @@
     <div class="attack-header" onclick="toggle('at')">
       <div class="attack-icon" style="background:rgba(0,140,255,0.12)">⚡</div>
       <div>
-        <div class="attack-title">Accidental Trigger</div>
-        <div class="attack-sub">Risk of a random touch opening the hidden panel</div>
+        <div class="attack-title">Kazara Tetikleme</div>
+        <div class="attack-sub">Rastgele dokunuşun gizli paneli açması riski</div>
       </div>
-      <div class="risk-badge risk-low">Low Risk</div>
+      <div class="risk-badge risk-low">Düşük Risk</div>
       <div class="chevron open" id="chev-at">▼</div>
     </div>
     <div class="attack-body" id="body-at">
       <div class="vs-row">
         <div class="vs-box vs-bad">
-          <div class="vs-label">Risk Scenario</div>
-          <div class="vs-text">A finger slip in a pocket or a quick touch may be interpreted as a gesture.</div>
+          <div class="vs-label">Risk Senaryosu</div>
+          <div class="vs-text">Cep içinde parmak sürçmesi veya hızlı dokunuş gesture olarak algılanabilir.</div>
         </div>
         <div class="vs-box vs-good">
-          <div class="vs-label">SGBA Solution</div>
-          <div class="vs-text">Speed filter + Proximity Sensor double shield. When pocket is detected, the system enters sleep mode.</div>
+          <div class="vs-label">SGBA Çözümü</div>
+          <div class="vs-text">Hız filtresi + Proximity Sensor çift kalkan. Cep algılandığında sistem uyku moduna girer.</div>
         </div>
       </div>
       <div class="demo-wrap">
-        <div class="demo-title">Security Filters</div>
+        <div class="demo-title">Güvenlik Filtreleri</div>
         <div class="at-row">
           <div class="at-item">
-            <div class="at-label">Speed Filter</div>
-            <div class="at-val" style="color:#00e5a0">Active</div>
+            <div class="at-label">Hız Filtresi</div>
+            <div class="at-val" style="color:#00e5a0">Aktif</div>
             <div class="at-bar"><div class="at-fill" style="width:85%;background:linear-gradient(90deg,#0066ff,#00e5a0)"></div></div>
           </div>
           <div class="at-item">
             <div class="at-label">Proximity Sensor</div>
-            <div class="at-val" style="color:#00e5a0">Active</div>
+            <div class="at-val" style="color:#00e5a0">Aktif</div>
             <div class="at-bar"><div class="at-fill" style="width:100%;background:linear-gradient(90deg,#0066ff,#00e5a0)"></div></div>
           </div>
           <div class="at-item">
-            <div class="at-label">Accidental Trigger Risk</div>
-            <div class="at-val" style="color:#00e5a0">0.3%</div>
+            <div class="at-label">Kazara Tetik. Riski</div>
+            <div class="at-val" style="color:#00e5a0">%0.3</div>
             <div class="at-bar"><div class="at-fill" style="width:3%;background:#ff6b6b"></div></div>
           </div>
         </div>
@@ -323,12 +326,13 @@ function toggle(id) {
   body.style.display = isOpen ? 'none' : 'block';
   chev.classList.toggle('open', !isOpen);
 }
+// All open on load
 ['bf','ss','at'].forEach(id => {
   document.getElementById('body-' + id).style.display = 'block';
 });
 
 /* ══════════════════════════════
-   BRUTE FORCE — Phone Canvas
+   BRUTE FORCE — Telefon Canvas
 ═══════════════════════════════ */
 const canvas = document.getElementById('bf-canvas');
 const ctx = canvas.getContext('2d');
@@ -339,6 +343,7 @@ function resizeCanvas() {
 }
 resizeCanvas();
 
+// gesture path generator
 function randomGesturePath(w, h) {
   const types = ['zigzag','circle','swipe','spiral','random'];
   const type  = types[Math.floor(Math.random() * types.length)];
@@ -372,6 +377,7 @@ function randomGesturePath(w, h) {
   return pts;
 }
 
+// hacking colors (red shades for attack)
 const hackColors = ['#ff3333','#ff6600','#ff0055','#ff4444','#cc0000','#ff2200'];
 
 let bfRunning = false;
@@ -384,21 +390,22 @@ function startBF() {
   bfTotal   = 0;
   document.getElementById('bf-log').innerHTML = '';
   document.getElementById('bf-btn').disabled  = true;
-  document.getElementById('bf-btn').textContent = '⚡ Attack in Progress...';
+  document.getElementById('bf-btn').textContent = '⚡ Saldırı Devam Ediyor...';
 
   let attempt = 0;
   const maxAttempts = 22;
 
   function nextAttempt() {
     if (attempt >= maxAttempts) {
+      // done
       bfRunning = false;
       document.getElementById('bf-btn').disabled  = false;
-      document.getElementById('bf-btn').textContent = '▶ Try Again';
-      document.getElementById('bf-phone-status').textContent = '❌ Failed';
+      document.getElementById('bf-btn').textContent = '▶ Tekrar Dene';
+      document.getElementById('bf-phone-status').textContent = '❌ Başarısız';
       document.getElementById('bf-phone-status').style.color = 'rgba(255,100,100,0.7)';
-      addLog('fail', `[SYSTEM] Could not crack after ${maxAttempts} attempts — zero feedback`);
+      addLog('fail', `[SİSTEM] ${maxAttempts} denemede kırılamadı — sıfır geri bildirim`);
       document.getElementById('bf-counter').innerHTML =
-        `Attempts: <b>${maxAttempts}</b> · Result: <b style="color:#ff6b6b">FAILED</b>`;
+        `Deneme: <b>${maxAttempts}</b> · Sonuç: <b style="color:#ff6b6b">BAŞARISIZ</b>`;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       return;
     }
@@ -414,15 +421,16 @@ function startBF() {
                     'G-'+Math.random().toString(36).substr(2,4).toUpperCase()];
     const code = codes[Math.floor(Math.random() * codes.length)];
 
-    addLog('try', `${shape} Attempt #${attempt}: ${code} → trying...`);
-    document.getElementById('bf-phone-status').textContent = '🔴 Attack!';
+    addLog('try', `${shape} Deneme #${attempt}: ${code} → deniyor...`);
+    document.getElementById('bf-phone-status').textContent = '🔴 Saldırı!';
     document.getElementById('bf-phone-status').style.color = 'rgba(255,80,80,0.9)';
     document.getElementById('bf-counter').innerHTML =
-      `Attempts: <b>${attempt}</b> / ${maxAttempts} · Result: <b style="color:#f9c74f">In Progress</b>`;
+      `Deneme: <b>${attempt}</b> / ${maxAttempts} · Sonuç: <b style="color:#f9c74f">Devam Ediyor</b>`;
 
     drawGesture(pts, color, () => {
+      // after draw, flash fail then next
       setTimeout(() => {
-        addLog('fail', `  ↳ #${attempt} REJECTED — no feedback`);
+        addLog('fail', `  ↳ #${attempt} REDDEDILDI — geri bildirim yok`);
         const delay = 300 + Math.random() * 400;
         setTimeout(nextAttempt, delay);
       }, 200);
@@ -435,12 +443,14 @@ function startBF() {
 function drawGesture(pts, color, onDone) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // glow bg pulse
   ctx.fillStyle = `rgba(${hexToRgb(color)}, 0.04)`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   let i = 0;
   const step = () => {
     if (i >= pts.length - 1) {
+      // draw endpoint dot
       ctx.beginPath();
       ctx.arc(pts[pts.length-1].x, pts[pts.length-1].y, 3, 0, Math.PI * 2);
       ctx.fillStyle = color;
@@ -452,6 +462,7 @@ function drawGesture(pts, color, onDone) {
       return;
     }
 
+    // draw segment
     ctx.beginPath();
     ctx.moveTo(pts[i].x, pts[i].y);
     ctx.lineTo(pts[i+1].x, pts[i+1].y);
@@ -463,6 +474,7 @@ function drawGesture(pts, color, onDone) {
     ctx.stroke();
     ctx.shadowBlur = 0;
 
+    // moving dot
     ctx.beginPath();
     ctx.arc(pts[i+1].x, pts[i+1].y, 2.5, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
@@ -508,7 +520,7 @@ function buildSSGrid(mode) {
   if (mode === 'bad') {
     const sf = document.createElement('div');
     sf.style.cssText = 'margin-top:4px;font-size:6px;color:rgba(231,76,60,0.8);text-align:center;font-weight:700;grid-column:span 3';
-    sf.textContent = '🔒 Secure Folder';
+    sf.textContent = '🔒 Güvenli Klasör';
     grid.appendChild(sf);
   }
 }
@@ -522,12 +534,12 @@ function ssSwitch(mode) {
   document.getElementById('ss-btn-bad').classList.remove('active');
   document.getElementById('ss-btn-good').classList.remove('active');
   if (mode === 'bad') {
-    ring.className = 'eye-ring danger'; text.className = 'eye-text danger'; text.textContent = 'Visible';
-    desc.textContent = 'Classic Secure Folder: the observer clearly sees the icon and asks "what are you hiding?"';
+    ring.className = 'eye-ring danger'; text.className = 'eye-text danger'; text.textContent = 'Görüyor';
+    desc.textContent = 'Klasik Güvenli Klasör: gözlemci simgeyi net görüyor ve "ne saklıyorsun?" diye soruyor.';
     document.getElementById('ss-btn-bad').classList.add('active');
   } else {
-    ring.className = 'eye-ring safe'; text.className = 'eye-text safe'; text.textContent = 'Hidden';
-    desc.textContent = 'With SGBA: no trace on screen. The observer sees a normal home screen. They cannot know the hidden section even exists.';
+    ring.className = 'eye-ring safe'; text.className = 'eye-text safe'; text.textContent = 'Göremez';
+    desc.textContent = 'SGBA ile: ekranda hiçbir iz yok. Gözlemci normal bir ana ekran görüyor. Gizli bölümün varlığından haberdar olamaz.';
     document.getElementById('ss-btn-good').classList.add('active');
   }
 }
