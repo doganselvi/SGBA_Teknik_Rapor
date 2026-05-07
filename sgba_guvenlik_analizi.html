@@ -6,79 +6,166 @@
 <title>SGBA – Güvenlik Analizi</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0f0f1a; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; padding: 24px 16px; }
-  h2 { color: #fff; font-size: 17px; font-weight: 500; text-align: center; margin-bottom: 4px; }
-  .subtitle { color: rgba(255,255,255,0.35); font-size: 12px; text-align: center; margin-bottom: 24px; }
+  body {
+    background: #050d1a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(0,100,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,60,180,0.1) 0%, transparent 60%);
+  }
 
-  .attacks { display: flex; flex-direction: column; gap: 16px; max-width: 600px; margin: 0 auto; }
+  h2 { color: #fff; font-size: 17px; font-weight: 600; text-align: center; margin-bottom: 4px; letter-spacing: 0.3px; }
+  .subtitle { color: rgba(100,160,255,0.5); font-size: 12px; text-align: center; margin-bottom: 24px; }
 
-  .attack-card { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; }
+  .attacks { display: flex; flex-direction: column; gap: 14px; max-width: 600px; margin: 0 auto; }
+
+  .attack-card {
+    background: rgba(0,40,100,0.18);
+    border: 0.5px solid rgba(0,100,255,0.18);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 24px rgba(0,60,200,0.08);
+    transition: border-color 0.3s;
+  }
+  .attack-card:hover { border-color: rgba(0,140,255,0.35); }
+
   .attack-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
   .attack-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-  .attack-title { font-size: 13px; font-weight: 600; color: #fff; }
-  .attack-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .attack-title { font-size: 13px; font-weight: 600; color: #e8f0ff; }
+  .attack-sub { font-size: 10px; color: rgba(140,180,255,0.5); margin-top: 2px; }
   .risk-badge { margin-left: auto; font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 600; flex-shrink: 0; }
-  .risk-high { background: rgba(231,76,60,0.2); color: #e74c3c; border: 0.5px solid rgba(231,76,60,0.3); }
-  .risk-mid { background: rgba(243,156,18,0.2); color: #f39c12; border: 0.5px solid rgba(243,156,18,0.3); }
-  .risk-low { background: rgba(29,184,115,0.15); color: #1DB873; border: 0.5px solid rgba(29,184,115,0.3); }
+  .risk-high { background: rgba(231,76,60,0.18); color: #ff6b6b; border: 0.5px solid rgba(231,76,60,0.3); }
+  .risk-mid  { background: rgba(243,156,18,0.18); color: #f9c74f; border: 0.5px solid rgba(243,156,18,0.3); }
+  .risk-low  { background: rgba(0,200,120,0.12); color: #00e5a0; border: 0.5px solid rgba(0,200,120,0.3); }
 
-  .attack-body { padding: 0 16px 16px; display: none; }
-  .attack-body.open { display: block; }
+  .attack-body { padding: 0 16px 16px; }
 
   .vs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
   .vs-box { border-radius: 10px; padding: 10px 12px; }
   .vs-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .vs-text { font-size: 11px; line-height: 1.6; }
-  .vs-bad { background: rgba(231,76,60,0.08); border: 0.5px solid rgba(231,76,60,0.2); }
-  .vs-bad .vs-label { color: #e74c3c; }
-  .vs-bad .vs-text { color: rgba(255,255,255,0.6); }
-  .vs-good { background: rgba(29,184,115,0.08); border: 0.5px solid rgba(29,184,115,0.2); }
-  .vs-good .vs-label { color: #1DB873; }
-  .vs-good .vs-text { color: rgba(255,255,255,0.6); }
+  .vs-bad { background: rgba(231,76,60,0.07); border: 0.5px solid rgba(231,76,60,0.2); }
+  .vs-bad .vs-label { color: #ff6b6b; }
+  .vs-bad .vs-text { color: rgba(200,220,255,0.55); }
+  .vs-good { background: rgba(0,140,255,0.07); border: 0.5px solid rgba(0,140,255,0.2); }
+  .vs-good .vs-label { color: #4db8ff; }
+  .vs-good .vs-text { color: rgba(200,220,255,0.55); }
 
-  .demo-wrap { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 12px; }
-  .demo-title { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .demo-wrap { background: rgba(0,20,60,0.4); border: 0.5px solid rgba(0,100,255,0.12); border-radius: 10px; padding: 12px; }
+  .demo-title { font-size: 10px; color: rgba(100,160,255,0.5); margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
 
-  /* Brute Force animasyonu */
-  .bf-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
-  .bf-cell { height: 18px; border-radius: 3px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 7px; color: rgba(255,255,255,0.2); transition: all 0.15s; }
-  .bf-cell.trying { background: rgba(243,156,18,0.3); color: #f39c12; }
-  .bf-cell.failed { background: rgba(231,76,60,0.15); color: rgba(231,76,60,0.4); }
-  .bf-status { font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 8px; }
-  .bf-status span { color: #1DB873; }
+  /* ── BRUTE FORCE ── */
+  .bf-scene { display: flex; gap: 16px; align-items: flex-start; }
+
+  /* Mini telefon */
+  .bf-phone-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .bf-phone {
+    width: 80px;
+    background: #080f1e;
+    border-radius: 16px;
+    padding: 7px 5px 10px;
+    border: 1.5px solid rgba(0,100,255,0.25);
+    box-shadow: 0 0 18px rgba(0,80,255,0.15);
+    position: relative;
+  }
+  .bf-notch { width: 24px; height: 4px; background: #1a2540; border-radius: 4px; margin: 0 auto 5px; }
+  .bf-screen {
+    background: #0c1628;
+    border-radius: 8px;
+    width: 100%;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+    border: 0.5px solid rgba(0,100,255,0.15);
+  }
+  .bf-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+  /* sağ panel: attempt log */
+  .bf-right { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .bf-log {
+    height: 116px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-right: 2px;
+  }
+  .bf-log::-webkit-scrollbar { width: 3px; }
+  .bf-log::-webkit-scrollbar-track { background: transparent; }
+  .bf-log::-webkit-scrollbar-thumb { background: rgba(0,100,255,0.25); border-radius: 3px; }
+
+  .bf-line {
+    font-size: 9px;
+    font-family: 'Courier New', monospace;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: all 0.2s;
+  }
+  .bf-line.show { opacity: 1; transform: translateX(0); }
+  .bf-line.fail { background: rgba(231,76,60,0.1); color: rgba(255,100,100,0.7); }
+  .bf-line.try  { background: rgba(243,156,18,0.1); color: rgba(249,199,79,0.8); }
+
+  .bf-counter { font-size: 9px; color: rgba(100,160,255,0.5); text-align: center; margin-top: 4px; }
+  .bf-counter b { color: #4db8ff; }
+
+  .sim-btn {
+    width: 100%; margin-top: 8px; padding: 7px;
+    border-radius: 8px;
+    border: 0.5px solid rgba(0,120,255,0.3);
+    background: rgba(0,80,255,0.08);
+    color: rgba(150,200,255,0.8);
+    font-size: 10px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sim-btn:hover { background: rgba(0,100,255,0.15); border-color: rgba(0,160,255,0.5); }
 
   /* Shoulder Surfing */
   .ss-scene { display: flex; align-items: center; gap: 16px; }
-  .ss-phone { width: 90px; background: #0a0a0a; border-radius: 18px; padding: 7px 5px; border: 1.5px solid #222; flex-shrink: 0; }
-  .ss-notch { width: 28px; height: 5px; background: #1a1a1a; border-radius: 4px; margin: 0 auto 5px; }
-  .ss-screen { background: #1c1c2e; border-radius: 10px; padding: 5px; height: 110px; overflow: hidden; }
+  .ss-phone { width: 90px; background: #0a0a0a; border-radius: 18px; padding: 7px 5px; border: 1.5px solid #1a2a40; flex-shrink: 0; }
+  .ss-notch { width: 28px; height: 5px; background: #1a1a2e; border-radius: 4px; margin: 0 auto 5px; }
+  .ss-screen { background: #0e1628; border-radius: 10px; padding: 5px; height: 110px; overflow: hidden; }
   .ss-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
   .ss-ic { width: 22px; height: 22px; border-radius: 6px; margin: 0 auto; }
   .eye-indicator { display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .eye-ring { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.4s; }
   .eye-ring.danger { background: rgba(231,76,60,0.2); border: 1.5px solid rgba(231,76,60,0.5); }
-  .eye-ring.safe { background: rgba(29,184,115,0.15); border: 1.5px solid rgba(29,184,115,0.4); }
+  .eye-ring.safe   { background: rgba(0,200,120,0.15); border: 1.5px solid rgba(0,200,120,0.4); }
   .eye-text { font-size: 9px; font-weight: 600; text-align: center; transition: all 0.4s; }
-  .eye-text.danger { color: #e74c3c; }
-  .eye-text.safe { color: #1DB873; }
-  .ss-desc { flex: 1; font-size: 10px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+  .eye-text.danger { color: #ff6b6b; }
+  .eye-text.safe   { color: #00e5a0; }
+  .ss-desc { flex: 1; font-size: 10px; color: rgba(140,180,255,0.5); line-height: 1.6; }
   .ss-toggle { display: flex; gap: 6px; margin-top: 10px; }
   .ss-btn { flex: 1; padding: 6px; border-radius: 7px; border: 0.5px solid; font-size: 10px; cursor: pointer; transition: all 0.2s; background: transparent; }
-  .ss-btn.red-btn { border-color: rgba(231,76,60,0.4); color: #e74c3c; }
+  .ss-btn.red-btn   { border-color: rgba(231,76,60,0.4); color: #ff6b6b; }
   .ss-btn.red-btn.active, .ss-btn.red-btn:hover { background: rgba(231,76,60,0.15); }
-  .ss-btn.green-btn { border-color: rgba(29,184,115,0.4); color: #1DB873; }
-  .ss-btn.green-btn.active, .ss-btn.green-btn:hover { background: rgba(29,184,115,0.1); }
+  .ss-btn.green-btn { border-color: rgba(0,200,120,0.4); color: #00e5a0; }
+  .ss-btn.green-btn.active, .ss-btn.green-btn:hover { background: rgba(0,200,120,0.1); }
 
   /* Accidental Trigger */
   .at-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .at-item { flex: 1; min-width: 120px; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px; }
-  .at-label { font-size: 9px; color: rgba(255,255,255,0.35); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .at-item { flex: 1; min-width: 120px; background: rgba(0,30,80,0.4); border: 0.5px solid rgba(0,100,255,0.1); border-radius: 8px; padding: 10px; }
+  .at-label { font-size: 9px; color: rgba(100,160,255,0.4); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
   .at-val { font-size: 12px; font-weight: 600; }
-  .at-bar { height: 4px; border-radius: 2px; margin-top: 4px; background: rgba(255,255,255,0.1); overflow: hidden; }
+  .at-bar { height: 4px; border-radius: 2px; margin-top: 4px; background: rgba(0,60,150,0.3); overflow: hidden; }
   .at-fill { height: 100%; border-radius: 2px; transition: width 0.8s; }
 
-  .chevron { font-size: 12px; color: rgba(255,255,255,0.3); margin-left: auto; transition: transform 0.2s; }
+  .chevron { font-size: 12px; color: rgba(0,140,255,0.4); margin-left: auto; transition: transform 0.2s; }
   .chevron.open { transform: rotate(180deg); }
+
+  /* scan line overlay */
+  .bf-screen::after {
+    content:'';
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,80,255,0.03) 2px, rgba(0,80,255,0.03) 4px);
+    pointer-events:none; z-index:10;
+  }
 </style>
 </head>
 <body>
@@ -97,7 +184,7 @@
         <div class="attack-sub">Tüm kombinasyonları deneyerek kırma girişimi</div>
       </div>
       <div class="risk-badge risk-low">Çok Düşük Risk</div>
-      <div class="chevron" id="chev-bf">▼</div>
+      <div class="chevron open" id="chev-bf">▼</div>
     </div>
     <div class="attack-body" id="body-bf">
       <div class="vs-row">
@@ -111,10 +198,29 @@
         </div>
       </div>
       <div class="demo-wrap">
-        <div class="demo-title">Simülasyon — Saldırgan sistemi kırmaya çalışıyor</div>
-        <div class="bf-grid" id="bf-grid"></div>
-        <div class="bf-status" id="bf-status">Başlatmak için tıkla</div>
-        <button onclick="startBF()" style="width:100%;margin-top:8px;padding:6px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:10px;cursor:pointer">Simülasyonu Başlat</button>
+        <div class="demo-title">⚔️ Simülasyon — Gerçek Zamanlı Saldırı</div>
+        <div class="bf-scene">
+
+          <!-- Telefon -->
+          <div class="bf-phone-wrap">
+            <div class="bf-phone">
+              <div class="bf-notch"></div>
+              <div class="bf-screen">
+                <canvas class="bf-canvas" id="bf-canvas"></canvas>
+              </div>
+            </div>
+            <div style="font-size:8px;color:rgba(255,100,100,0.6);text-align:center;margin-top:2px" id="bf-phone-status">Bekleniyor</div>
+          </div>
+
+          <!-- Log paneli -->
+          <div class="bf-right">
+            <div class="bf-log" id="bf-log">
+              <div style="font-size:9px;color:rgba(100,160,255,0.3);font-style:italic;padding:4px">Simülasyonu başlatmak için butona tıkla…</div>
+            </div>
+            <div class="bf-counter" id="bf-counter">Deneme: <b>0</b> · Sonuç: <b style="color:#ff6b6b">—</b></div>
+          </div>
+        </div>
+        <button class="sim-btn" id="bf-btn" onclick="startBF()">▶ Saldırıyı Başlat</button>
       </div>
     </div>
   </div>
@@ -128,7 +234,7 @@
         <div class="attack-sub">Kullanıcıyı izleyerek hareketi öğrenme</div>
       </div>
       <div class="risk-badge risk-mid">Orta Risk</div>
-      <div class="chevron" id="chev-ss">▼</div>
+      <div class="chevron open" id="chev-ss">▼</div>
     </div>
     <div class="attack-body" id="body-ss">
       <div class="vs-row">
@@ -167,13 +273,13 @@
   <!-- ACCIDENTAL TRIGGER -->
   <div class="attack-card">
     <div class="attack-header" onclick="toggle('at')">
-      <div class="attack-icon" style="background:rgba(52,168,83,0.12)">⚡</div>
+      <div class="attack-icon" style="background:rgba(0,140,255,0.12)">⚡</div>
       <div>
         <div class="attack-title">Kazara Tetikleme</div>
         <div class="attack-sub">Rastgele dokunuşun gizli paneli açması riski</div>
       </div>
       <div class="risk-badge risk-low">Düşük Risk</div>
-      <div class="chevron" id="chev-at">▼</div>
+      <div class="chevron open" id="chev-at">▼</div>
     </div>
     <div class="attack-body" id="body-at">
       <div class="vs-row">
@@ -191,18 +297,18 @@
         <div class="at-row">
           <div class="at-item">
             <div class="at-label">Hız Filtresi</div>
-            <div class="at-val" style="color:#1DB873">Aktif</div>
-            <div class="at-bar"><div class="at-fill" style="width:85%;background:#1DB873"></div></div>
+            <div class="at-val" style="color:#00e5a0">Aktif</div>
+            <div class="at-bar"><div class="at-fill" style="width:85%;background:linear-gradient(90deg,#0066ff,#00e5a0)"></div></div>
           </div>
           <div class="at-item">
             <div class="at-label">Proximity Sensor</div>
-            <div class="at-val" style="color:#1DB873">Aktif</div>
-            <div class="at-bar"><div class="at-fill" style="width:100%;background:#1DB873"></div></div>
+            <div class="at-val" style="color:#00e5a0">Aktif</div>
+            <div class="at-bar"><div class="at-fill" style="width:100%;background:linear-gradient(90deg,#0066ff,#00e5a0)"></div></div>
           </div>
           <div class="at-item">
             <div class="at-label">Kazara Tetik. Riski</div>
-            <div class="at-val" style="color:#1DB873">%0.3</div>
-            <div class="at-bar"><div class="at-fill" style="width:3%;background:#1DB873"></div></div>
+            <div class="at-val" style="color:#00e5a0">%0.3</div>
+            <div class="at-bar"><div class="at-fill" style="width:3%;background:#ff6b6b"></div></div>
           </div>
         </div>
       </div>
@@ -212,51 +318,195 @@
 </div>
 
 <script>
+/* ── toggle (all open by default) ── */
 function toggle(id) {
   const body = document.getElementById('body-' + id);
   const chev = document.getElementById('chev-' + id);
-  body.classList.toggle('open');
-  chev.classList.toggle('open');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  chev.classList.toggle('open', !isOpen);
+}
+// All open on load
+['bf','ss','at'].forEach(id => {
+  document.getElementById('body-' + id).style.display = 'block';
+});
+
+/* ══════════════════════════════
+   BRUTE FORCE — Telefon Canvas
+═══════════════════════════════ */
+const canvas = document.getElementById('bf-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width  = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+resizeCanvas();
+
+// gesture path generator
+function randomGesturePath(w, h) {
+  const types = ['zigzag','circle','swipe','spiral','random'];
+  const type  = types[Math.floor(Math.random() * types.length)];
+  const pts   = [];
+
+  if (type === 'swipe') {
+    const y = h * (0.2 + Math.random() * 0.6);
+    const x0 = w * 0.1, x1 = w * 0.9;
+    for (let t = 0; t <= 1; t += 0.05)
+      pts.push({ x: x0 + (x1 - x0) * t, y: y + Math.sin(t * Math.PI * 4) * 6 });
+  } else if (type === 'zigzag') {
+    const steps = 5 + Math.floor(Math.random() * 4);
+    for (let i = 0; i <= steps; i++) {
+      pts.push({ x: w * 0.1 + (w * 0.8 / steps) * i, y: (i % 2 === 0 ? h * 0.3 : h * 0.7) });
+    }
+  } else if (type === 'circle') {
+    const cx = w * 0.5, cy = h * 0.5, r = Math.min(w, h) * 0.3;
+    for (let a = 0; a <= Math.PI * 2; a += 0.15)
+      pts.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r });
+  } else if (type === 'spiral') {
+    const cx = w * 0.5, cy = h * 0.5;
+    for (let a = 0; a <= Math.PI * 4; a += 0.15) {
+      const r = (a / (Math.PI * 4)) * Math.min(w, h) * 0.38;
+      pts.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r });
+    }
+  } else {
+    const n = 12;
+    for (let i = 0; i < n; i++)
+      pts.push({ x: w * 0.1 + Math.random() * w * 0.8, y: h * 0.1 + Math.random() * h * 0.8 });
+  }
+  return pts;
 }
 
-// Brute Force sim
-const bfGrid = document.getElementById('bf-grid');
-for (let i = 0; i < 32; i++) {
-  const c = document.createElement('div');
-  c.className = 'bf-cell';
-  c.id = 'bfc' + i;
-  c.textContent = '—';
-  bfGrid.appendChild(c);
-}
+// hacking colors (red shades for attack)
+const hackColors = ['#ff3333','#ff6600','#ff0055','#ff4444','#cc0000','#ff2200'];
 
 let bfRunning = false;
+let bfTotal   = 0;
+let bfAnimId  = null;
+
 function startBF() {
   if (bfRunning) return;
   bfRunning = true;
-  document.querySelectorAll('.bf-cell').forEach(c => { c.className = 'bf-cell'; c.textContent = '—'; });
-  document.getElementById('bf-status').innerHTML = 'Saldırgan deniyor...';
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i > 0) {
-      const prev = document.getElementById('bfc' + (i - 1));
-      prev.classList.remove('trying');
-      prev.classList.add('failed');
-      prev.textContent = '✗';
-    }
-    if (i >= 32) {
-      clearInterval(interval);
-      document.getElementById('bf-status').innerHTML = '32 deneme · <span>Sıfır geri bildirim</span> · Saldırgan nerede olduğunu bilemiyor';
+  bfTotal   = 0;
+  document.getElementById('bf-log').innerHTML = '';
+  document.getElementById('bf-btn').disabled  = true;
+  document.getElementById('bf-btn').textContent = '⚡ Saldırı Devam Ediyor...';
+
+  let attempt = 0;
+  const maxAttempts = 22;
+
+  function nextAttempt() {
+    if (attempt >= maxAttempts) {
+      // done
       bfRunning = false;
+      document.getElementById('bf-btn').disabled  = false;
+      document.getElementById('bf-btn').textContent = '▶ Tekrar Dene';
+      document.getElementById('bf-phone-status').textContent = '❌ Başarısız';
+      document.getElementById('bf-phone-status').style.color = 'rgba(255,100,100,0.7)';
+      addLog('fail', `[SİSTEM] ${maxAttempts} denemede kırılamadı — sıfır geri bildirim`);
+      document.getElementById('bf-counter').innerHTML =
+        `Deneme: <b>${maxAttempts}</b> · Sonuç: <b style="color:#ff6b6b">BAŞARISIZ</b>`;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       return;
     }
-    const cell = document.getElementById('bfc' + i);
-    cell.classList.add('trying');
-    cell.textContent = i + 1;
-    i++;
-  }, 180);
+
+    attempt++;
+    bfTotal++;
+    const pts   = randomGesturePath(canvas.width, canvas.height);
+    const color = hackColors[Math.floor(Math.random() * hackColors.length)];
+    const shapes = ['◈','△','✦','⬡','⊕','⟡','◉','⬟'];
+    const shape  = shapes[Math.floor(Math.random() * shapes.length)];
+    const codes  = ['0x'+Math.floor(Math.random()*0xFFFF).toString(16).padStart(4,'0'),
+                    Math.floor(Math.random()*9999).toString().padStart(4,'0'),
+                    'G-'+Math.random().toString(36).substr(2,4).toUpperCase()];
+    const code = codes[Math.floor(Math.random() * codes.length)];
+
+    addLog('try', `${shape} Deneme #${attempt}: ${code} → deniyor...`);
+    document.getElementById('bf-phone-status').textContent = '🔴 Saldırı!';
+    document.getElementById('bf-phone-status').style.color = 'rgba(255,80,80,0.9)';
+    document.getElementById('bf-counter').innerHTML =
+      `Deneme: <b>${attempt}</b> / ${maxAttempts} · Sonuç: <b style="color:#f9c74f">Devam Ediyor</b>`;
+
+    drawGesture(pts, color, () => {
+      // after draw, flash fail then next
+      setTimeout(() => {
+        addLog('fail', `  ↳ #${attempt} REDDEDILDI — geri bildirim yok`);
+        const delay = 300 + Math.random() * 400;
+        setTimeout(nextAttempt, delay);
+      }, 200);
+    });
+  }
+
+  nextAttempt();
 }
 
-// Shoulder Surfing
+function drawGesture(pts, color, onDone) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // glow bg pulse
+  ctx.fillStyle = `rgba(${hexToRgb(color)}, 0.04)`;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  let i = 0;
+  const step = () => {
+    if (i >= pts.length - 1) {
+      // draw endpoint dot
+      ctx.beginPath();
+      ctx.arc(pts[pts.length-1].x, pts[pts.length-1].y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      if (onDone) onDone();
+      return;
+    }
+
+    // draw segment
+    ctx.beginPath();
+    ctx.moveTo(pts[i].x, pts[i].y);
+    ctx.lineTo(pts[i+1].x, pts[i+1].y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 6;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // moving dot
+    ctx.beginPath();
+    ctx.arc(pts[i+1].x, pts[i+1].y, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    i++;
+    setTimeout(step, 18 + Math.random() * 12);
+  };
+  step();
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function addLog(type, text) {
+  const log  = document.getElementById('bf-log');
+  const line = document.createElement('div');
+  line.className = `bf-line ${type}`;
+  line.textContent = text;
+  log.appendChild(line);
+  requestAnimationFrame(() => line.classList.add('show'));
+  log.scrollTop = log.scrollHeight;
+}
+
+/* ── Shoulder Surfing ── */
 function buildSSGrid(mode) {
   const grid = document.getElementById('ss-grid');
   grid.innerHTML = '';
@@ -265,17 +515,15 @@ function buildSSGrid(mode) {
     const ic = document.createElement('div');
     ic.className = 'ss-ic';
     ic.style.background = colors[i];
-    ic.style.borderRadius = '6px';
     grid.appendChild(ic);
   }
   if (mode === 'bad') {
     const sf = document.createElement('div');
-    sf.style.cssText = 'margin-top:4px;font-size:6px;color:rgba(231,76,60,0.8);text-align:center;font-weight:700';
+    sf.style.cssText = 'margin-top:4px;font-size:6px;color:rgba(231,76,60,0.8);text-align:center;font-weight:700;grid-column:span 3';
     sf.textContent = '🔒 Güvenli Klasör';
     grid.appendChild(sf);
   }
 }
-
 buildSSGrid('bad');
 
 function ssSwitch(mode) {
@@ -286,15 +534,11 @@ function ssSwitch(mode) {
   document.getElementById('ss-btn-bad').classList.remove('active');
   document.getElementById('ss-btn-good').classList.remove('active');
   if (mode === 'bad') {
-    ring.className = 'eye-ring danger';
-    text.className = 'eye-text danger';
-    text.textContent = 'Görüyor';
+    ring.className = 'eye-ring danger'; text.className = 'eye-text danger'; text.textContent = 'Görüyor';
     desc.textContent = 'Klasik Güvenli Klasör: gözlemci simgeyi net görüyor ve "ne saklıyorsun?" diye soruyor.';
     document.getElementById('ss-btn-bad').classList.add('active');
   } else {
-    ring.className = 'eye-ring safe';
-    text.className = 'eye-text safe';
-    text.textContent = 'Göremez';
+    ring.className = 'eye-ring safe'; text.className = 'eye-text safe'; text.textContent = 'Göremez';
     desc.textContent = 'SGBA ile: ekranda hiçbir iz yok. Gözlemci normal bir ana ekran görüyor. Gizli bölümün varlığından haberdar olamaz.';
     document.getElementById('ss-btn-good').classList.add('active');
   }
