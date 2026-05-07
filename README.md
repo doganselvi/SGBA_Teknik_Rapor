@@ -3,15 +3,15 @@
 
 ## 🧪 Live Demos
 
-👉 [v4 Final Demo (End-to-End Flow)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo_v4_NEW_eng.html)
+👉 [v4 Final Demo (End-to-End Flow)]TR(https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo_v4_NEW_eng.html)
 
-👉 [v2 UI Mockup (Advanced Interface)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup_v2_eng.html)
+👉 [v2 UI Mockup (Advanced Interface)]TR(https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup_v2_eng.html)
 
-👉 [v2 Registration System (Advanced Vector)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_kayit_v2%20NEW.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/SGBA___Gesture_Registration__EN_.html)
+👉 [v2 Registration System (Advanced Vector)]TR(https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_kayit_v2%20NEW.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/SGBA___Gesture_Registration__EN_.html)
 
-👉 [Security Analysis](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_guvenlik_analizi.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/Writing_sgba_security_analysis_eng_html.html)
+👉 [Security Analysis]TR(https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_guvenlik_analizi.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/Writing_sgba_security_analysis_eng_html.html)
 
-👉 [v2 Use Cases](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_use_cases_eng.html)
+👉 [v2 Use Cases]TR(https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_use_cases_eng.html)
 
 # 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v2.9)
 
