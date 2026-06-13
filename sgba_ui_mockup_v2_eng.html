@@ -3,47 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SGBA – UI Mockup v2 ENG</title>
+<title>SGBA - UI Mockup v3</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0f0f1a; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
-
+body { background: #000000; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
+ 
 h2 { color: #fff; font-size: 16px; font-weight: 500; margin-bottom: 4px; text-align: center; }
 .subtitle { color: rgba(255,255,255,0.35); font-size: 11px; margin-bottom: 20px; text-align: center; }
-
+ 
 .phone {
   width: 220px;
-  background: #0a0a0a;
+  background: #000000;
   border-radius: 40px;
   padding: 16px 12px;
-  border: 2px solid #2a2a2a;
-  box-shadow: 0 0 0 1px #1a1a1a;
+  border: 2px solid #1a1a1a;
+  box-shadow: 0 0 0 1px #0a0a0a;
   position: relative;
 }
-.notch { width: 64px; height: 11px; background: #1a1a1a; border-radius: 8px; margin: 0 auto 12px; }
-.screen { background: #1c1c2e; border-radius: 26px; overflow: hidden; min-height: 400px; position: relative; }
-.status-bar { display: flex; justify-content: space-between; padding: 7px 14px 4px; font-size: 9px; color: rgba(255,255,255,0.6); }
-
+.notch { width: 64px; height: 11px; background: #0a0a0a; border-radius: 8px; margin: 0 auto 12px; }
+.screen { background: #0c0c0c; border-radius: 26px; overflow: hidden; min-height: 400px; position: relative; }
+.status-bar { display: flex; justify-content: space-between; padding: 7px 14px 4px; font-size: 9px; color: rgba(255,255,255,0.6); position: relative; z-index: 50; }
+ 
 /* Ekranlar */
-.ekran { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+.ekran { display: none; position: absolute; top: 20px; left: 0; right: 0; bottom: 0; overflow-y: auto; }
 .ekran.aktif { display: block; animation: fadeIn 0.25s ease; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
+ 
 /* Ana Ekran */
 .app-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; padding: 10px 8px; }
 .app-ic { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 17px; margin: 0 auto; cursor: pointer; transition: transform 0.1s; }
 .app-ic:active { transform: scale(0.9); }
 .app-nm { font-size: 7px; color: rgba(255,255,255,0.65); text-align: center; margin-top: 2px; }
 .no-trace-bar { margin: 4px 8px; padding: 6px; background: rgba(255,255,255,0.04); border-radius: 10px; text-align: center; }
-
+ 
 /* Header bar */
-.screen-header { background: #13132a; padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+.screen-header { background: #0e1750; padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
 .back-btn { font-size: 16px; color: rgba(255,255,255,0.6); cursor: pointer; padding: 2px 6px; border-radius: 6px; transition: background 0.15s; }
 .back-btn:hover { background: rgba(255,255,255,0.08); }
 .hdr-title { font-size: 12px; font-weight: 600; color: #fff; }
 .hdr-sub { font-size: 8px; color: rgba(255,255,255,0.4); margin-top: 1px; }
-
-/* Ayarlar satırları */
+ 
+/* Settings rows */
 .sec-label { padding: 8px 14px 3px; font-size: 8px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
 .row { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.15s; }
 .row:hover { background: rgba(255,255,255,0.03); }
@@ -51,37 +51,73 @@ h2 { color: #fff; font-size: 16px; font-weight: 500; margin-bottom: 4px; text-al
 .row-lbl { font-size: 10px; color: rgba(255,255,255,0.85); font-weight: 500; }
 .row-sub { font-size: 8px; color: rgba(255,255,255,0.35); margin-top: 1px; }
 .chevron { width: 6px; height: 6px; border-right: 1.5px solid rgba(255,255,255,0.3); border-bottom: 1.5px solid rgba(255,255,255,0.3); transform: rotate(-45deg); }
-
+ 
 /* Toggle */
 .toggle { width: 28px; height: 16px; border-radius: 8px; background: rgba(255,255,255,0.15); position: relative; transition: background 0.3s; cursor: pointer; flex-shrink: 0; }
-.toggle.on { background: #1DB873; }
+.toggle.on { background: #3a7bd5; }
 .toggle::after { content:''; position: absolute; width: 12px; height: 12px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: transform 0.3s; }
 .toggle.on::after { transform: translateX(12px); }
-
-/* Gesture Kayıt Ekranı */
-.canvas-wrap { margin: 10px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(29,184,115,0.35); border-radius: 14px; padding: 8px; }
-canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
-.canvas-hint { font-size: 8px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 5px; }
+ 
+/* Gesture Recording Screen */
+#scr-kayit { background: #0a1142; }
+.canvas-wrap { margin: 10px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(58,123,213,0.4); border-radius: 14px; padding: 8px; transition: border-color 0.3s; }
+.canvas-wrap.fail-border { border-color: rgba(232,69,69,0.5); border-style: solid; }
+.canvas-wrap.ok-border { border-color: rgba(58,123,213,0.7); border-style: solid; }
+canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; touch-action: none; }
+.canvas-hint { font-size: 8px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 5px; min-height: 11px; transition: color 0.3s; }
+.canvas-hint.warn { color: rgba(232,69,69,0.85); }
+.canvas-hint.ok { color: rgba(58,123,213,0.9); }
+.fail-msg { display: none; background: rgba(232,69,69,0.1); border: 0.5px solid rgba(232,69,69,0.3); border-radius: 8px; padding: 6px 10px; font-size: 8px; color: rgba(232,69,69,0.9); text-align: center; margin: 0 10px 6px; line-height: 1.4; }
 .repeat-dots { display: flex; justify-content: center; gap: 8px; margin: 8px 0; }
 .rdot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); transition: all 0.3s; }
-.rdot.done { background: #1DB873; }
-.rdot.active { background: #1DB873; box-shadow: 0 0 6px #1DB873; }
+.rdot.done { background: #3a7bd5; }
+.rdot.active { background: #3a7bd5; box-shadow: 0 0 6px #3a7bd5; }
+.rdot.fail { background: #e84545; box-shadow: 0 0 6px #e84545; }
 .rec-btn { margin: 0 10px; width: calc(100% - 20px); padding: 8px; border-radius: 10px; border: none; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.rec-btn.green { background: #1DB873; color: #fff; }
+.rec-btn.green { background: #3a7bd5; color: #fff; }
 .rec-btn.green:disabled { opacity: 0.4; cursor: default; }
 .rec-btn.gray { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); margin-top: 5px; }
-
-/* Tolerans Ekranı */
+ 
+/* Similarity bar */
+.sim-bar-wrap { margin: 0 10px 8px; display: none; }
+.sim-label { display: flex; justify-content: space-between; font-size: 8px; color: rgba(255,255,255,0.3); margin-bottom: 3px; }
+.sim-bar-bg { background: rgba(255,255,255,0.08); border-radius: 4px; height: 4px; overflow: hidden; }
+.sim-bar-fill { height: 100%; border-radius: 4px; background: #3a7bd5; width: 0%; transition: width 0.5s cubic-bezier(0.4,0,0.2,1), background 0.3s; }
+.sim-bar-fill.low { background: #e84545; }
+.sim-bar-fill.mid { background: #f0a742; }
+ 
+/* Recording info cards */
+.kayit-info-row { display: flex; gap: 6px; margin: 8px 10px 4px; }
+.kayit-info-card { flex: 1; background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 6px 4px; text-align: center; }
+.kayit-info-card .ki-label { font-size: 6.5px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+.kayit-info-card .ki-val { font-size: 10px; color: #fff; font-weight: 600; font-family: monospace; }
+.kayit-info-card .ki-val.green { color: #3a7bd5; }
+.kayit-info-card .ki-val.red { color: #e84545; }
+.kayit-info-card .ki-val.amber { color: #f0a742; }
+ 
+/* PIN screen */
+.pin-display { display: flex; justify-content: center; gap: 10px; margin: 18px 0; }
+.pin-box { width: 34px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(58,123,213,0.4); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; font-family: monospace; }
+.pin-keypad { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 0 10px; }
+.pin-key { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 0; font-size: 13px; color: #fff; text-align: center; cursor: pointer; transition: background 0.15s; font-weight: 600; }
+.pin-key:hover { background: rgba(58,123,213,0.25); }
+.pin-key:active { background: rgba(58,123,213,0.4); }
+.pin-key.wide { grid-column: span 1; font-size: 10px; color: rgba(255,255,255,0.4); }
+.pin-title { text-align: center; font-size: 12px; font-weight: 600; color: #fff; margin: 14px 0 2px; }
+.pin-sub { text-align: center; font-size: 8px; color: rgba(255,255,255,0.35); margin-bottom: 4px; }
+.pin-shield { width: 40px; height: 40px; border-radius: 50%; background: rgba(58,123,213,0.15); border: 1.5px solid #3a7bd5; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 6px auto 0; }
+ 
+/* Tolerance Screen */
 .tol-option { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.15s; }
 .tol-option:hover { background: rgba(255,255,255,0.03); }
 .tol-label { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; }
 .tol-sub { font-size: 8px; color: rgba(255,255,255,0.35); margin-top: 1px; }
 .tol-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 9px; transition: all 0.2s; }
-.tol-check.selected { background: #1DB873; border-color: #1DB873; color: #fff; }
-
-/* Başarı / Gizli Panel */
+.tol-check.selected { background: #3a7bd5; border-color: #3a7bd5; color: #fff; }
+ 
+/* Success / Hidden Panel */
 .success-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; gap: 7px; min-height: 360px; }
-.suc-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(29,184,115,0.2); border: 1.5px solid #1DB873; display: flex; align-items: center; justify-content: center; font-size: 22px; animation: pop 0.4s ease; }
+.suc-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(58,123,213,0.2); border: 1.5px solid #3a7bd5; display: flex; align-items: center; justify-content: center; font-size: 22px; animation: pop 0.4s ease; }
 @keyframes pop { 0%{transform:scale(0.7);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
 .suc-title { font-size: 13px; font-weight: 600; color: #fff; }
 .suc-sub { font-size: 8px; color: rgba(255,255,255,0.35); text-align: center; }
@@ -89,33 +125,33 @@ canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
 .sapp { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .sapp-ic { width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 19px; }
 .sapp-nm { font-size: 7px; color: rgba(255,255,255,0.6); }
-.zero-badge { font-size: 7px; background: rgba(29,184,115,0.15); color: #1DB873; padding: 3px 8px; border-radius: 5px; border: 0.5px solid rgba(29,184,115,0.3); margin-top: 4px; }
+.zero-badge { font-size: 7px; background: rgba(58,123,213,0.15); color: #3a7bd5; padding: 3px 8px; border-radius: 5px; border: 0.5px solid rgba(58,123,213,0.3); margin-top: 4px; }
 .divider { height: 0.5px; background: rgba(255,255,255,0.07); width: 100%; margin: 2px 0; }
-
+ 
 /* Toast */
-.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(29,184,115,0.95); color: #fff; padding: 8px 18px; border-radius: 20px; font-size: 11px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; white-space: nowrap; }
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(58,123,213,0.95); color: #fff; padding: 8px 18px; border-radius: 20px; font-size: 11px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; white-space: nowrap; }
 .toast.show { opacity: 1; }
-
+ 
 /* Step indicator */
 .step-info { text-align: center; font-size: 9px; color: rgba(255,255,255,0.4); padding: 6px 0 2px; }
-
-/* Navigasyon çubuk */
+ 
+/* Navigation bar */
 .nav-bar { display: flex; justify-content: center; gap: 6px; padding: 8px 0 4px; }
 .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.15); }
 .nav-dot.cur { background: #fff; }
 </style>
 </head>
 <body>
-
+ 
 <h2>SGBA — Interactive UI Demo</h2>
 <div class="subtitle">Tap Settings · Draw gesture · Activate the system</div>
-
+ 
 <div class="phone">
   <div class="notch"></div>
   <div class="screen" id="main-screen">
     <div class="status-bar"><span id="saat">9:41</span><span>●●● 5G 🔋</span></div>
-
-    <!-- ANA EKRAN -->
+ 
+    <!-- HOME SCREEN -->
     <div class="ekran aktif" id="scr-home">
       <div class="app-grid">
         <div><div class="app-ic" style="background:#1a73e8">📞</div><div class="app-nm">Phone</div></div>
@@ -124,7 +160,7 @@ canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
         <div><div class="app-ic" style="background:#fbbc04">🎵</div><div class="app-nm">Music</div></div>
         <div><div class="app-ic" style="background:#9c27b0">📸</div><div class="app-nm">Gallery</div></div>
         <div><div class="app-ic" style="background:#ff5722">🌐</div><div class="app-nm">Chrome</div></div>
-        <div onclick="git('scr-ayarlar')" style="cursor:pointer"><div class="app-ic" style="background:#009688">⚙️</div><div class="app-nm" style="color:#1DB873">Settings</div></div>
+        <div onclick="git('scr-ayarlar')" style="cursor:pointer"><div class="app-ic" style="background:#009688">⚙️</div><div class="app-nm" style="color:#3a7bd5">Settings</div></div>
         <div><div class="app-ic" style="background:#607d8b">🗺️</div><div class="app-nm">Maps</div></div>
       </div>
       <div class="no-trace-bar">
@@ -132,8 +168,8 @@ canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
         <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:2px">⚙️ Tap Settings → Activate SGBA</div>
       </div>
     </div>
-
-    <!-- AYARLAR ANA -->
+ 
+    <!-- SETTINGS -->
     <div class="ekran" id="scr-ayarlar">
       <div class="screen-header">
         <span class="back-btn" onclick="git('scr-home')">←</span>
@@ -166,27 +202,38 @@ canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
         <div style="font-size:8px;color:rgba(255,255,255,0.2);text-align:center" id="sgba-durum">SGBA is currently inactive</div>
       </div>
     </div>
-
-    <!-- GESTURE KAYIT -->
+ 
+    <!-- GESTURE RECORDING -->
     <div class="ekran" id="scr-kayit">
       <div class="screen-header">
         <span class="back-btn" onclick="git('scr-ayarlar')">←</span>
-        <div><div class="hdr-title" id="kayit-baslik">Step 1/3 — Draw Gesture</div><div class="hdr-sub">Draw your movement on the empty area</div></div>
+        <div><div class="hdr-title" id="kayit-baslik">Step 1/3 — Draw Gesture</div><div class="hdr-sub" id="kayit-altbaslik">Draw the motion in one stroke without lifting your finger</div></div>
       </div>
       <div class="repeat-dots">
         <div class="rdot active" id="rd1"></div>
         <div class="rdot" id="rd2"></div>
         <div class="rdot" id="rd3"></div>
       </div>
-      <div class="canvas-wrap">
+      <div class="fail-msg" id="fail-msg"></div>
+      <div class="canvas-wrap" id="canvas-wrap">
         <canvas id="gc" height="130"></canvas>
         <div class="canvas-hint" id="gc-hint">Drag your finger</div>
+      </div>
+      <div class="sim-bar-wrap" id="sim-bar-wrap">
+        <div class="sim-label"><span>Vector similarity</span><span id="sim-pct-label">—</span></div>
+        <div class="sim-bar-bg"><div class="sim-bar-fill" id="sim-bar"></div></div>
+      </div>
+      <div class="kayit-info-row">
+        <div class="kayit-info-card"><div class="ki-label">Repeat</div><div class="ki-val green" id="ki-rep">0 / 3</div></div>
+        <div class="kayit-info-card"><div class="ki-label">Similarity</div><div class="ki-val" id="ki-sim">—</div></div>
+        <div class="kayit-info-card"><div class="ki-label">Length</div><div class="ki-val" id="ki-len">— px</div></div>
+        <div class="kayit-info-card"><div class="ki-label">Status</div><div class="ki-val" id="ki-status">Waiting</div></div>
       </div>
       <button class="rec-btn green" id="onay-btn" onclick="onaylaAdim()" disabled>Confirm</button>
       <button class="rec-btn gray" onclick="temizle()">Redraw</button>
     </div>
-
-    <!-- TOLERANS SEÇİMİ -->
+ 
+    <!-- TOLERANCE SELECTION -->
     <div class="ekran" id="scr-tolerans">
       <div class="screen-header">
         <span class="back-btn" onclick="git('scr-ayarlar')">←</span>
@@ -194,7 +241,7 @@ canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
       </div>
       <div style="height:8px"></div>
       <div class="tol-option" onclick="secTolerans(80,'80% · Easy')">
-        <div><div class="tol-label">80% — Easy</div><div class="tol-sub">Wide tolerance, quick access</div></div>
+        <div><div class="tol-label">80% — Easy</div><div class="tol-sub">Wide tolerance, fast access</div></div>
         <div class="tol-check" id="tc-80"></div>
       </div>
       <div class="tol-option" onclick="secTolerans(85,'85% · Standard')">
@@ -202,7 +249,7 @@ canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
         <div class="tol-check selected" id="tc-85">✓</div>
       </div>
       <div class="tol-option" onclick="secTolerans(90,'90% · High')">
-        <div><div class="tol-label">90% — High Security</div><div class="tol-sub">Strict match, maximum protection</div></div>
+        <div><div class="tol-label">90% — High Security</div><div class="tol-sub">Strict matching, maximum protection</div></div>
         <div class="tol-check" id="tc-90"></div>
       </div>
       <div class="tol-option" onclick="secTolerans(95,'95% · Maximum')">
@@ -210,8 +257,38 @@ canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
         <div class="tol-check" id="tc-95"></div>
       </div>
     </div>
-
-    <!-- GİZLİ PANEL -->
+ 
+    <!-- PIN SCREEN -->
+    <div class="ekran" id="scr-pin">
+      <div class="success-wrap" style="min-height:400px;justify-content:flex-start;padding-top:24px">
+        <div class="pin-shield">🛡️</div>
+        <div class="pin-title">Gesture Verified</div>
+        <div class="pin-sub">Enter PIN to continue</div>
+        <div class="pin-display">
+          <div class="pin-box" id="pb1"></div>
+          <div class="pin-box" id="pb2"></div>
+          <div class="pin-box" id="pb3"></div>
+          <div class="pin-box" id="pb4"></div>
+        </div>
+        <div class="canvas-hint" id="pin-hint" style="margin-bottom:6px">PIN: 1938</div>
+        <div class="pin-keypad">
+          <div class="pin-key" onclick="pinTus('1')">1</div>
+          <div class="pin-key" onclick="pinTus('2')">2</div>
+          <div class="pin-key" onclick="pinTus('3')">3</div>
+          <div class="pin-key" onclick="pinTus('4')">4</div>
+          <div class="pin-key" onclick="pinTus('5')">5</div>
+          <div class="pin-key" onclick="pinTus('6')">6</div>
+          <div class="pin-key" onclick="pinTus('7')">7</div>
+          <div class="pin-key" onclick="pinTus('8')">8</div>
+          <div class="pin-key" onclick="pinTus('9')">9</div>
+          <div class="pin-key wide" onclick="pinSil()">Delete</div>
+          <div class="pin-key" onclick="pinTus('0')">0</div>
+          <div class="pin-key wide" onclick="git('scr-home')">Cancel</div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- HIDDEN PANEL -->
     <div class="ekran" id="scr-gizli">
       <div class="success-wrap">
         <div class="suc-icon">🔓</div>
@@ -219,66 +296,72 @@ canvas { display: block; border-radius: 10px; cursor: crosshair; width: 100%; }
         <div class="suc-sub">Gesture verified · Knox secured</div>
         <div class="divider"></div>
         <div class="secret-apps">
-          <div class="sapp"><div class="sapp-ic" style="background:rgba(29,184,115,0.15);border:0.5px solid rgba(29,184,115,0.3)">💼</div><div class="sapp-nm">Work Files</div></div>
-          <div class="sapp"><div class="sapp-ic" style="background:rgba(33,150,243,0.15);border:0.5px solid rgba(33,150,243,0.3)">🏦</div><div class="sapp-nm">Bank</div></div>
+          <div class="sapp"><div class="sapp-ic" style="background:rgba(58,123,213,0.15);border:0.5px solid rgba(58,123,213,0.3)">💼</div><div class="sapp-nm">Work Files</div></div>
+          <div class="sapp"><div class="sapp-ic" style="background:rgba(33,150,243,0.15);border:0.5px solid rgba(33,150,243,0.3)">🏦</div><div class="sapp-nm">Banking</div></div>
           <div class="sapp"><div class="sapp-ic" style="background:rgba(156,39,176,0.15);border:0.5px solid rgba(156,39,176,0.3)">🔒</div><div class="sapp-nm">Private Notes</div></div>
         </div>
         <div class="zero-badge">Zero visual trace from outside</div>
         <div style="margin-top:10px">
-          <button onclick="git('scr-home');resetGesture()" style="padding:6px 16px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:9px;cursor:pointer">Back to Home</button>
+          <button onclick="git('scr-home');resetGesture()" style="padding:6px 16px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:9px;cursor:pointer">Return to Home</button>
         </div>
       </div>
     </div>
-
+ 
   </div><!-- /screen -->
 </div><!-- /phone -->
-
+ 
 <div id="toast" class="toast"></div>
-
-<!-- AÇIKLAMA ALTINDA -->
+ 
+<!-- INFO BELOW -->
 <div style="max-width:260px;margin-top:16px;display:flex;flex-direction:column;gap:8px">
   <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;font-size:10px;color:rgba(255,255,255,0.5);line-height:1.6">
-    <span style="color:#1DB873;font-weight:600">How to try it?</span><br>
+    <span style="color:#3a7bd5;font-weight:600">How to try it?</span><br>
     1. ⚙️ Tap Settings<br>
     2. Turn on the SGBA toggle<br>
-    3. Go to "Record Gesture" and draw<br>
-    4. Select tolerance<br>
-    5. Return to home screen → draw gesture
+    3. Open "Record Gesture" and draw<br>
+    4. Select a tolerance<br>
+    5. Return to home → draw the gesture
   </div>
-  <div id="durum-kart" style="background:rgba(29,184,115,0.06);border:0.5px solid rgba(29,184,115,0.15);border-radius:10px;padding:8px 12px;font-size:9px;color:rgba(255,255,255,0.4);display:none">
-    <span style="color:#1DB873;font-weight:600">System Status</span><br>
+  <div id="durum-kart" style="background:rgba(58,123,213,0.06);border:0.5px solid rgba(58,123,213,0.15);border-radius:10px;padding:8px 12px;font-size:9px;color:rgba(255,255,255,0.4);display:none">
+    <span style="color:#3a7bd5;font-weight:600">System Status</span><br>
     <span id="dk-sgba">SGBA: Inactive</span><br>
     <span id="dk-gesture">Gesture: Not recorded</span><br>
     <span id="dk-tol">Tolerance: 85% Standard</span><br>
     <span id="dk-knox">Knox: Off</span>
   </div>
 </div>
-
+ 
 <script>
-// Saat güncelle
+// Update clock
 function updateSaat() {
   const n = new Date();
   document.getElementById('saat').textContent = n.getHours() + ':' + String(n.getMinutes()).padStart(2,'0');
 }
 updateSaat();
 setInterval(updateSaat, 10000);
-
+ 
 // State
 let state = { sgba: false, knox: false, gestureKayit: false, tolerans: 85, tolLabel: '85% · Standard', tekrar: 0 };
-
+ 
 function git(id) {
   document.querySelectorAll('.ekran').forEach(e => e.classList.remove('aktif'));
   document.getElementById(id).classList.add('aktif');
   if (id === 'scr-kayit') { resetGestureEkran(); }
+  if (id === 'scr-pin') {
+    pinGirilen = '';
+    pinGuncelle();
+    document.getElementById('pin-hint').textContent = 'PIN: 1938';
+    document.getElementById('pin-hint').style.color = '';
+  }
 }
-
+ 
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
-
+ 
 function guncelleDurumKart() {
   document.getElementById('durum-kart').style.display = 'block';
   document.getElementById('dk-sgba').textContent = 'SGBA: ' + (state.sgba ? '✅ Active' : '❌ Inactive');
@@ -286,23 +369,23 @@ function guncelleDurumKart() {
   document.getElementById('dk-tol').textContent = 'Tolerance: ' + state.tolLabel;
   document.getElementById('dk-knox').textContent = 'Knox: ' + (state.knox ? '✅ Active' : '❌ Off');
 }
-
+ 
 function toggleSGBA() {
   state.sgba = !state.sgba;
   document.getElementById('toggle-sgba').classList.toggle('on', state.sgba);
-  document.getElementById('sgba-durum').textContent = state.sgba ? '✅ SGBA aktif — gesture ile erişim açık' : 'SGBA şu an pasif';
-  document.getElementById('sgba-durum').style.color = state.sgba ? '#1DB873' : 'rgba(255,255,255,0.2)';
-  toast(state.sgba ? 'SGBA aktif edildi ✓' : 'SGBA devre dışı');
+  document.getElementById('sgba-durum').textContent = state.sgba ? '✅ SGBA active — gesture access enabled' : 'SGBA is currently inactive';
+  document.getElementById('sgba-durum').style.color = state.sgba ? '#3a7bd5' : 'rgba(255,255,255,0.2)';
+  toast(state.sgba ? 'SGBA activated ✓' : 'SGBA disabled');
   guncelleDurumKart();
 }
-
+ 
 function toggleKnox() {
   state.knox = !state.knox;
   document.getElementById('toggle-knox').classList.toggle('on', state.knox);
-  toast(state.knox ? 'Knox Biyometrik aktif ✓' : 'Knox Biyometrik kapatıldı');
+  toast(state.knox ? 'Knox Biometric activated ✓' : 'Knox Biometric disabled');
   guncelleDurumKart();
 }
-
+ 
 function secTolerans(val, label) {
   state.tolerans = val;
   state.tolLabel = label;
@@ -312,87 +395,291 @@ function secTolerans(val, label) {
     else { el.classList.remove('selected'); el.textContent = ''; }
   });
   document.getElementById('tol-sub').textContent = label;
-  toast('Tolerans: ' + label + ' seçildi ✓');
+  toast('Tolerance: ' + label + ' selected ✓');
   guncelleDurumKart();
   setTimeout(() => git('scr-ayarlar'), 600);
 }
-
-// Canvas gesture kayıt
+ 
+// Canvas gesture recording (advanced — with similarity analysis)
+const MIN_PX = 60;
+const SIM_PASS = 80;
+const RESAMPLE = 64;
+ 
 const canvas = document.getElementById('gc');
 const ctx = canvas.getContext('2d');
 canvas.width = canvas.offsetWidth || 180;
-let drawing = false, points = [];
-
-ctx.strokeStyle = 'rgba(29,184,115,0.8)';
-ctx.lineWidth = 2.5;
-ctx.lineCap = 'round';
-
+let drawing = false, lifted = false, points = [];
+let referenceVectors = [], currentSim = null;
+ 
 function getPos(e) {
   const r = canvas.getBoundingClientRect();
   if (e.touches) return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
   return { x: e.clientX - r.left, y: e.clientY - r.top };
 }
-
-canvas.addEventListener('mousedown', e => { drawing = true; points = []; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
-canvas.addEventListener('mousemove', e => {
+ 
+function pathLength(pts) {
+  let d = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const dx = pts[i].x - pts[i-1].x, dy = pts[i].y - pts[i-1].y;
+    d += Math.sqrt(dx*dx + dy*dy);
+  }
+  return d;
+}
+ 
+function resample(pts, n) {
+  const total = pathLength(pts);
+  if (total === 0) return [];
+  const step = total / (n - 1);
+  const out = [{ x: pts[0].x, y: pts[0].y }];
+  let dist = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const dx = pts[i].x - pts[i-1].x, dy = pts[i].y - pts[i-1].y;
+    const seg = Math.sqrt(dx*dx + dy*dy);
+    while (dist + seg >= step * out.length && out.length < n) {
+      const t = (step * out.length - dist) / seg;
+      out.push({ x: pts[i-1].x + t*dx, y: pts[i-1].y + t*dy });
+    }
+    dist += seg;
+  }
+  while (out.length < n) out.push(pts[pts.length - 1]);
+  return out;
+}
+ 
+function normalize(pts) {
+  const cx = pts.reduce((s,p) => s+p.x, 0) / pts.length;
+  const cy = pts.reduce((s,p) => s+p.y, 0) / pts.length;
+  const c = pts.map(p => ({ x: p.x - cx, y: p.y - cy }));
+  const scale = Math.sqrt(c.reduce((s,p) => s + p.x*p.x + p.y*p.y, 0) / c.length);
+  return scale === 0 ? c : c.map(p => ({ x: p.x/scale, y: p.y/scale }));
+}
+ 
+function cosineSim(a, b) {
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i].x*b[i].x + a[i].y*b[i].y;
+    na += a[i].x*a[i].x + a[i].y*a[i].y;
+    nb += b[i].x*b[i].x + b[i].y*b[i].y;
+  }
+  if (na === 0 || nb === 0) return 0;
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+ 
+function directionPenalty(a, b) {
+  const angleA = Math.atan2(a[a.length-1].y - a[0].y, a[a.length-1].x - a[0].x);
+  const angleB = Math.atan2(b[b.length-1].y - b[0].y, b[b.length-1].x - b[0].x);
+  const diff = Math.abs(angleA - angleB) % (2 * Math.PI);
+  const norm = Math.min(diff, 2 * Math.PI - diff) / Math.PI;
+  return 1 - norm * 0.4;
+}
+ 
+function similarity(rawA, rawB) {
+  const a = normalize(resample(rawA, RESAMPLE));
+  const b = normalize(resample(rawB, RESAMPLE));
+  const cs = cosineSim(a, b);
+  const cs01 = (cs + 1) / 2;
+  const dir = directionPenalty(rawA, rawB);
+  return cs01 * dir * 100;
+}
+ 
+function avgSimilarityToRef(cur) {
+  if (referenceVectors.length === 0) return 100;
+  const sims = referenceVectors.map(ref => similarity(ref, cur));
+  return sims.reduce((s,v) => s+v, 0) / sims.length;
+}
+ 
+function redrawPath(pts, color) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (pts.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+}
+ 
+function setHint(text, cls) {
+  const h = document.getElementById('gc-hint');
+  h.textContent = text;
+  h.className = 'canvas-hint' + (cls ? ' ' + cls : '');
+}
+ 
+function setSimDisplay(pct) {
+  const bar = document.getElementById('sim-bar');
+  const lbl = document.getElementById('sim-pct-label');
+  const sv = document.getElementById('ki-sim');
+  if (pct === null) {
+    sv.textContent = '—';
+    sv.className = 'ki-val';
+    document.getElementById('sim-bar-wrap').style.display = 'none';
+    return;
+  }
+  const p = Math.round(pct);
+  document.getElementById('sim-bar-wrap').style.display = 'block';
+  lbl.textContent = p + '%';
+  bar.style.width = p + '%';
+  bar.className = 'sim-bar-fill' + (p < 60 ? ' low' : p < 80 ? ' mid' : '');
+  sv.textContent = p + '%';
+  sv.className = 'ki-val' + (p >= 80 ? ' green' : p >= 60 ? ' amber' : ' red');
+}
+ 
+function showFailMsg(txt) {
+  const el = document.getElementById('fail-msg');
+  el.textContent = txt;
+  el.style.display = txt ? 'block' : 'none';
+}
+ 
+function startDraw(e) {
+  if (lifted) return;
+  drawing = true;
+  points = [];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const p = getPos(e);
+  points.push(p);
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+  showFailMsg('');
+  document.getElementById('canvas-wrap').className = 'canvas-wrap';
+}
+ 
+function moveDraw(e) {
   if (!drawing) return;
-  const p = getPos(e); points.push(p);
-  ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y);
-  if (points.length > 8) { document.getElementById('onay-btn').disabled = false; document.getElementById('gc-hint').textContent = 'Harika! Onayla butonuna bas'; }
-});
-canvas.addEventListener('mouseup', () => { drawing = false; });
-canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; points = []; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, {passive:false});
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault(); if (!drawing) return;
-  const p = getPos(e); points.push(p);
-  ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y);
-  if (points.length > 8) { document.getElementById('onay-btn').disabled = false; document.getElementById('gc-hint').textContent = 'Harika! Onayla butonuna bas'; }
-}, {passive:false});
-canvas.addEventListener('touchend', () => { drawing = false; });
-
+  const p = getPos(e);
+  points.push(p);
+  ctx.strokeStyle = 'rgba(58,123,213,0.8)';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+  document.getElementById('ki-len').textContent = Math.round(pathLength(points)) + ' px';
+}
+ 
+function endDraw() {
+  if (!drawing) return;
+  drawing = false;
+  lifted = true;
+ 
+  const len = pathLength(points);
+  document.getElementById('ki-len').textContent = Math.round(len) + ' px';
+ 
+  if (len < MIN_PX || points.length < 8) {
+    redrawPath(points, 'rgba(232,69,69,0.6)');
+    setHint('Too short! Draw a longer motion', 'warn');
+    document.getElementById('canvas-wrap').className = 'canvas-wrap fail-border';
+    document.getElementById('onay-btn').disabled = true;
+    document.getElementById('ki-status').textContent = 'Too Short';
+    document.getElementById('ki-status').className = 'ki-val red';
+    return;
+  }
+ 
+  let sim = 100;
+  if (referenceVectors.length > 0) {
+    sim = avgSimilarityToRef(points);
+    currentSim = sim;
+    const p = Math.round(sim);
+    setSimDisplay(sim);
+ 
+    if (sim < SIM_PASS) {
+      redrawPath(points, 'rgba(232,69,69,0.55)');
+      document.getElementById('canvas-wrap').className = 'canvas-wrap fail-border';
+      setHint('Similarity too low! Try again', 'warn');
+      showFailMsg('Similarity ' + p + '% (threshold: ' + SIM_PASS + '%) — draw a more similar motion');
+      document.getElementById('onay-btn').disabled = true;
+      document.getElementById('ki-status').textContent = 'No Match';
+      document.getElementById('ki-status').className = 'ki-val red';
+      const dot = ['rd1','rd2','rd3'][state.tekrar];
+      if (dot) { document.getElementById(dot).classList.add('fail'); setTimeout(() => document.getElementById(dot).classList.remove('fail'), 600); }
+      return;
+    }
+  } else {
+    currentSim = null;
+  }
+ 
+  redrawPath(points, 'rgba(58,123,213,0.8)');
+  document.getElementById('canvas-wrap').className = 'canvas-wrap ok-border';
+  setHint('Great! Tap Confirm', 'ok');
+  document.getElementById('onay-btn').disabled = false;
+  document.getElementById('ki-status').textContent = 'Ready ✓';
+  document.getElementById('ki-status').className = 'ki-val green';
+}
+ 
+canvas.addEventListener('mousedown', e => { e.preventDefault(); if (!lifted) startDraw(e); });
+canvas.addEventListener('mousemove', e => { e.preventDefault(); moveDraw(e); });
+canvas.addEventListener('mouseup', () => endDraw());
+canvas.addEventListener('mouseleave', () => { if (drawing) endDraw(); });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); if (!lifted) startDraw(e); }, {passive:false});
+canvas.addEventListener('touchmove', e => { e.preventDefault(); moveDraw(e); }, {passive:false});
+canvas.addEventListener('touchend', e => { e.preventDefault(); endDraw(); }, {passive:false});
+canvas.addEventListener('touchcancel', () => { if (drawing) endDraw(); });
+ 
 function temizle() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  points = [];
+  points = []; drawing = false; lifted = false; currentSim = null;
   document.getElementById('onay-btn').disabled = true;
-  document.getElementById('gc-hint').textContent = 'Parmağını sürükle';
+  setHint('Drag your finger', '');
+  document.getElementById('canvas-wrap').className = 'canvas-wrap';
+  showFailMsg('');
+  document.getElementById('ki-len').textContent = '— px';
+  setSimDisplay(null);
+  document.getElementById('ki-status').textContent = 'Waiting';
+  document.getElementById('ki-status').className = 'ki-val';
 }
-
+ 
 function resetGestureEkran() {
   state.tekrar = 0;
+  referenceVectors = [];
   temizle();
   updateDots();
-  document.getElementById('kayit-baslik').textContent = 'Adım 1/3 — Gesture Çiz';
+  document.getElementById('kayit-baslik').textContent = 'Step 1/3 — Draw Gesture';
+  document.getElementById('kayit-altbaslik').textContent = 'Draw the motion in one stroke without lifting your finger';
+  document.getElementById('ki-rep').textContent = '0 / 3';
 }
-
+ 
 function updateDots() {
   ['rd1','rd2','rd3'].forEach((id,i) => {
     const d = document.getElementById(id);
-    d.classList.remove('done','active');
+    d.classList.remove('done','active','fail');
     if (i < state.tekrar) d.classList.add('done');
     if (i === state.tekrar) d.classList.add('active');
   });
 }
-
+ 
+const stepTitles = ['Step 1/3 — Draw Gesture','Step 2/3 — Redraw','Step 3/3 — Final Repeat'];
+const stepSubs = ['Draw the motion in one stroke without lifting your finger','Repeat the same motion once more','Last time — confirm the motion'];
+ 
 function onaylaAdim() {
+  referenceVectors.push([...points]);
   state.tekrar++;
+  document.getElementById('ki-rep').textContent = state.tekrar + ' / 3';
+  document.getElementById('ki-status').textContent = 'Repeat ' + state.tekrar + ' ✓';
+  document.getElementById('ki-status').className = 'ki-val green';
   updateDots();
-  const titles = ['Adım 2/3 — Tekrar Çiz','Adım 3/3 — Son Tekrar','Kaydediliyor...'];
-  document.getElementById('kayit-baslik').textContent = titles[state.tekrar - 1] || 'Tamamlandı';
-  temizle();
-
+ 
   if (state.tekrar >= 3) {
+    setSimDisplay(currentSim !== null ? currentSim : 96);
+    document.getElementById('kayit-baslik').textContent = 'Saving...';
     state.gestureKayit = true;
-    document.getElementById('kayit-sub').textContent = 'Kaydedildi ✓';
-    toast('Gesture başarıyla kaydedildi ✓');
+    document.getElementById('kayit-sub').textContent = 'Recorded ✓';
+    toast('Gesture recorded successfully ✓');
     guncelleDurumKart();
-    setTimeout(() => git('scr-ayarlar'), 800);
+    setTimeout(() => git('scr-ayarlar'), 900);
+    return;
   }
+ 
+  document.getElementById('kayit-baslik').textContent = stepTitles[state.tekrar];
+  document.getElementById('kayit-altbaslik').textContent = stepSubs[state.tekrar];
+  setTimeout(() => temizle(), 300);
 }
-
-// Ana ekranda gesture ile gizli panel aç
+ 
+// Open PIN screen via home screen gesture
 let homePoints = [], homeDrawing = false;
 const homeScr = document.getElementById('scr-home');
-
+ 
 homeScr.addEventListener('mousedown', e => {
   if (e.target.closest('.app-ic')) return;
   homeDrawing = true; homePoints = [];
@@ -405,18 +692,55 @@ homeScr.addEventListener('mouseup', () => {
   if (!homeDrawing) return;
   homeDrawing = false;
   if (homePoints.length > 15 && state.sgba && state.gestureKayit) {
-    git('scr-gizli');
-    toast('Gizli Panel açıldı ✓');
+    git('scr-pin');
+    toast('Gesture matched — enter PIN');
   } else if (homePoints.length > 15 && !state.sgba) {
-    toast('Önce SGBA\'yı aktif et!');
+    toast('Activate SGBA first!');
   } else if (homePoints.length > 15 && !state.gestureKayit) {
-    toast('Önce gesture kaydet!');
+    toast('Record a gesture first!');
   }
   homePoints = [];
 });
-
+ 
 function resetGesture() {
-  // Ana ekrana dönerken state korunur
+  // State is preserved when returning to home
+}
+ 
+// PIN logic
+const SGBA_PIN = '1938';
+let pinGirilen = '';
+ 
+function pinGuncelle() {
+  for (let i = 1; i <= 4; i++) {
+    const box = document.getElementById('pb' + i);
+    box.textContent = pinGirilen[i-1] || '';
+  }
+}
+ 
+function pinTus(d) {
+  if (pinGirilen.length >= 4) return;
+  pinGirilen += d;
+  pinGuncelle();
+  if (pinGirilen.length === 4) {
+    if (pinGirilen === SGBA_PIN) {
+      toast('PIN verified ✓');
+      setTimeout(() => { git('scr-gizli'); toast('Hidden Panel opened ✓'); pinGirilen = ''; pinGuncelle(); }, 350);
+    } else {
+      document.getElementById('pin-hint').textContent = 'Wrong PIN! Correct PIN: 1938';
+      document.getElementById('pin-hint').style.color = 'rgba(232,69,69,0.85)';
+      setTimeout(() => {
+        pinGirilen = '';
+        pinGuncelle();
+        document.getElementById('pin-hint').textContent = 'PIN: 1938';
+        document.getElementById('pin-hint').style.color = '';
+      }, 900);
+    }
+  }
+}
+ 
+function pinSil() {
+  pinGirilen = pinGirilen.slice(0, -1);
+  pinGuncelle();
 }
 </script>
 </body>
