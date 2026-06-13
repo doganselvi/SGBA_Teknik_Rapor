@@ -5,7 +5,7 @@
 
 👉 [v4 Final Demo TR (End-to-End Flow)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_demo_v4_NEW_eng.html)
 
-👉 [v2 UI Mockup TR (Advanced Interface)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup_v2_eng.html)
+👉 [v4 UI Mockup TR (Advanced Interface)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_ui_mockup_v2_eng.html)
 
 👉 [v2 Registration System TR (Advanced Vector)](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_gesture_kayit_v2%20NEW.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/SGBA___Gesture_Registration__EN_.html)
 
