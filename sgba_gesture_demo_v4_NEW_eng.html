@@ -1,300 +1,856 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGBA – InvisibleShield Demo</title>
 <style>
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.15)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(400%)}}
-@keyframes ripple{0%{transform:scale(0.6);opacity:0.7}100%{transform:scale(1.8);opacity:0}}
-@keyframes ringPulse{0%,100%{opacity:0.3;transform:scale(1)}50%{opacity:0.7;transform:scale(1.04)}}
-@keyframes successPop{0%{transform:scale(0.85);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
-.step-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0;transition:background .3s}
-.step-dot.active{background:#1DB873;animation:pulse .8s ease-in-out infinite}
-.step-dot.done{background:#1DB873;animation:none}
-#dtw-bar{transition:width .6s ease}
-#status-text{font-size:12px;color:#555;text-align:center;min-height:18px}
-.pin-btn{
-  width:56px;height:56px;border-radius:50%;
-  background:#f0f0f0;
-  border:1.5px solid #bbb;
-  font-size:20px;font-weight:500;
-  color:#111;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:background .15s,transform .1s;
-  user-select:none;
-  box-shadow:0 1px 3px rgba(0,0,0,0.12);
-}
-.pin-btn:hover{background:#e0e0e0}
-.pin-btn:active{transform:scale(0.92);background:#d0d0d0}
-.pin-dot{width:12px;height:12px;border-radius:50%;border:2px solid #aaa;transition:background .2s,border-color .2s;background:transparent}
-.pin-dot.filled{background:#1DB873;border-color:#1DB873}
-.pin-dot.err{background:#e84545;border-color:#e84545}
-#fp-btn{
-  width:68px;height:68px;border-radius:50%;
-  background:#f0f0f0;
-  border:2px solid #bbb;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;
-  transition:border-color .3s,background .3s;
-  user-select:none;-webkit-user-select:none;
-  box-shadow:0 1px 4px rgba(0,0,0,0.15);
-}
-#fp-btn.scanning{border-color:#1DB873;background:#f0fff8}
-#fp-btn.success{border-color:#1DB873;background:#e0fff2}
-#fp-scan{position:absolute;top:0;left:0;width:100%;height:25%;background:linear-gradient(transparent,rgba(29,184,115,0.45),transparent);animation:scanline 1s linear infinite;display:none}
-#fp-ripple1,#fp-ripple2{position:absolute;width:100%;height:100%;border-radius:50%;border:2px solid rgba(29,184,115,0.5);animation:ripple 1.2s ease-out infinite;display:none}
-#fp-ripple2{animation-delay:.5s}
-.fp-ring{position:absolute;width:100%;height:100%;border-radius:50%;border:2px solid rgba(29,184,115,0.25);animation:ringPulse 1.2s ease-in-out infinite;display:none}
-#fp-progress{position:absolute;bottom:0;left:0;height:3px;width:0%;background:#1DB873;transition:width .1s linear}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 50%,#16213e 100%);
+    min-height:100vh;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:20px;
+  }
+
+  /* ── Üst Başlık ── */
+  .page-title{
+    text-align:center;margin-bottom:18px;
+  }
+  .page-title h1{
+    font-size:20px;font-weight:700;color:#fff;letter-spacing:.5px;
+  }
+  .page-title p{
+    font-size:12px;color:rgba(255,255,255,0.55);margin-top:4px;
+  }
+
+  /* ── Telefon Çerçevesi ── */
+  .phone-wrap{
+    position:relative;width:300px;
+  }
+  .phone-frame{
+    background:linear-gradient(145deg,#2a2a2a,#1a1a1a);
+    border-radius:44px;
+    padding:12px;
+    box-shadow:
+      0 0 0 2px #444,
+      0 0 0 4px #222,
+      0 30px 80px rgba(0,0,0,0.7),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    position:relative;
+  }
+  /* Yan tuşlar */
+  .phone-frame::before{
+    content:'';position:absolute;
+    right:-4px;top:100px;
+    width:4px;height:50px;
+    background:#333;border-radius:0 3px 3px 0;
+    box-shadow:0 70px 0 #333;
+  }
+  .phone-frame::after{
+    content:'';position:absolute;
+    left:-4px;top:80px;
+    width:4px;height:35px;
+    background:#333;border-radius:3px 0 0 3px;
+    box-shadow:0 50px 0 #333,0 100px 0 #333;
+  }
+  .phone-screen{
+    background:#000;
+    border-radius:34px;
+    overflow:hidden;
+    position:relative;
+    height:580px;
+  }
+  /* Dinamik Ada (pill kamera) */
+  .dynamic-island{
+    position:absolute;top:10px;left:50%;transform:translateX(-50%);
+    width:110px;height:30px;
+    background:#000;border-radius:20px;
+    z-index:100;
+    box-shadow:0 0 0 2px #1a1a1a;
+    display:flex;align-items:center;justify-content:flex-end;padding-right:8px;gap:4px;
+  }
+  .di-cam{width:10px;height:10px;border-radius:50%;background:#1a1a1a;border:1px solid #333;}
+  .di-dot{width:5px;height:5px;border-radius:50%;background:#1a1a1a;}
+
+  /* Durum Çubuğu */
+  .status-bar{
+    position:absolute;top:0;left:0;right:0;
+    height:52px;
+    display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 20px 6px;
+    z-index:50;
+    background:transparent;
+  }
+  .status-time{font-size:13px;font-weight:600;color:#fff;}
+  .status-icons{display:flex;align-items:center;gap:5px;}
+  .status-icons svg{width:14px;height:14px;fill:#fff;}
+  .signal-bars{display:flex;align-items:flex-end;gap:1.5px;}
+  .signal-bars span{width:3px;background:#fff;border-radius:1px;}
+
+  /* Ana Ekran Sayfası */
+  #screen-home{
+    position:absolute;inset:0;
+    background:linear-gradient(160deg,#1a3a5c 0%,#0d1b2a 60%,#0a0f1e 100%);
+  }
+  /* Wallpaper efekti */
+  #screen-home::before{
+    content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse at 30% 20%,rgba(100,180,255,0.12) 0%,transparent 60%),
+      radial-gradient(ellipse at 80% 80%,rgba(150,100,255,0.1) 0%,transparent 50%);
+  }
+
+  .home-widget{
+    position:absolute;top:60px;left:16px;right:16px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(20px);
+    border-radius:20px;padding:14px 16px;
+    border:1px solid rgba(255,255,255,0.12);
+  }
+  .widget-time{font-size:40px;font-weight:300;color:#fff;line-height:1;}
+  .widget-date{font-size:12px;color:rgba(255,255,255,0.65);margin-top:4px;}
+  .widget-weather{font-size:12px;color:rgba(255,255,255,0.65);margin-top:2px;}
+
+  /* Uygulama İkonları */
+  .app-grid{
+    position:absolute;top:190px;left:16px;right:16px;
+    display:grid;grid-template-columns:repeat(4,1fr);
+    gap:14px;
+  }
+  .app-icon{
+    display:flex;flex-direction:column;align-items:center;gap:5px;
+    cursor:default;
+  }
+  .app-icon-img{
+    width:52px;height:52px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.4);
+    flex-shrink:0;
+  }
+  .app-icon-label{
+    font-size:9.5px;color:rgba(255,255,255,0.85);
+    text-shadow:0 1px 3px rgba(0,0,0,0.8);
+    text-align:center;white-space:nowrap;
+  }
+
+  /* Dock */
+  .dock{
+    position:absolute;bottom:36px;left:16px;right:16px;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(25px);
+    border-radius:24px;padding:10px 14px;
+    border:1px solid rgba(255,255,255,0.18);
+    display:flex;justify-content:space-around;align-items:center;
+  }
+  .dock .app-icon-img{width:46px;height:46px;border-radius:12px;font-size:20px;}
+
+  /* Home Bar */
+  .home-bar{
+    position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+    width:100px;height:4px;
+    background:rgba(255,255,255,0.5);border-radius:3px;
+  }
+
+  /* ── Gesture Canvas Katmanı ── */
+  #gesture-canvas{
+    position:absolute;inset:0;z-index:20;pointer-events:none;
+  }
+
+  /* ── Bilgi Balonu ── */
+  .info-bubble{
+    position:absolute;
+    background:rgba(0,0,0,0.78);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:12px;
+    padding:8px 12px;
+    font-size:11px;color:#fff;
+    max-width:200px;
+    z-index:200;
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);
+    pointer-events:none;
+    opacity:0;transition:opacity .3s;
+    line-height:1.5;
+  }
+  .info-bubble.show{opacity:1;}
+  .info-bubble .tag{
+    display:inline-block;
+    background:#1DB873;color:#fff;
+    font-size:9px;font-weight:700;
+    padding:1px 5px;border-radius:4px;margin-bottom:4px;
+    letter-spacing:.3px;
+  }
+
+  /* ── PIN Ekranı ── */
+  #screen-pin{
+    position:absolute;inset:0;
+    background:linear-gradient(160deg,#0d1b2a 0%,#0a0f1e 100%);
+    display:flex;flex-direction:column;align-items:center;
+    padding-top:60px;
+  }
+  .pin-lock-icon{font-size:36px;margin-bottom:6px;}
+  .pin-title{font-size:16px;font-weight:600;color:#fff;margin-bottom:3px;}
+  .pin-subtitle{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px;}
+  .pin-hint{
+    font-size:11px;
+    background:rgba(29,184,115,0.18);
+    border:1px solid rgba(29,184,115,0.4);
+    border-radius:8px;
+    padding:5px 12px;
+    color:#1DB873;
+    margin-bottom:18px;
+    font-weight:500;
+  }
+  .pin-hint span{font-weight:700;font-size:13px;}
+  .pin-dots{display:flex;justify-content:center;gap:16px;margin-bottom:24px;}
+  .pin-dot{
+    width:13px;height:13px;border-radius:50%;
+    border:2px solid rgba(255,255,255,0.3);
+    background:transparent;
+    transition:background .2s,border-color .2s,transform .15s;
+  }
+  .pin-dot.filled{background:#1DB873;border-color:#1DB873;transform:scale(1.1);}
+  .pin-dot.err{background:#e84545;border-color:#e84545;}
+
+  .pin-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:10px;width:195px;margin-bottom:24px;
+  }
+  .pin-btn{
+    width:58px;height:58px;border-radius:50%;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.15);
+    font-size:22px;font-weight:400;color:#fff;
+    cursor:pointer;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    transition:background .15s,transform .1s;
+    user-select:none;
+    box-shadow:0 2px 8px rgba(0,0,0,0.3);
+    gap:1px;
+  }
+  .pin-btn .sub{font-size:7px;color:rgba(255,255,255,0.4);letter-spacing:1px;font-weight:500;}
+  .pin-btn:active{transform:scale(0.92);background:rgba(255,255,255,0.22);}
+
+  /* Parmak izi */
+  .fp-section{
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+  }
+  .fp-or{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;}
+  #fp-btn{
+    width:62px;height:62px;border-radius:50%;
+    background:rgba(255,255,255,0.08);
+    border:2px solid rgba(255,255,255,0.2);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+    transition:border-color .3s,background .3s;
+    user-select:none;-webkit-user-select:none;
+  }
+  #fp-btn.scanning{border-color:#1DB873;background:rgba(29,184,115,0.12);}
+  #fp-btn.success{border-color:#1DB873;background:rgba(29,184,115,0.2);}
+  #fp-scan{position:absolute;top:0;left:0;width:100%;height:25%;
+    background:linear-gradient(transparent,rgba(29,184,115,0.5),transparent);
+    animation:scanline 1s linear infinite;display:none;}
+  #fp-progress{position:absolute;bottom:0;left:0;height:3px;width:0%;
+    background:#1DB873;transition:width .1s linear;}
+  .fp-label{font-size:10px;color:rgba(255,255,255,0.45);}
+
+  /* ── Gizli Panel ── */
+  #screen-folder{
+    position:absolute;inset:0;
+    background:linear-gradient(160deg,#0f1923 0%,#0a0f1e 100%);
+    padding-top:60px;
+  }
+  .folder-header{
+    padding:0 16px 14px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    margin-bottom:16px;
+  }
+  .folder-title{font-size:16px;font-weight:600;color:#fff;}
+  .folder-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;}
+  .folder-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    font-size:10px;color:#1DB873;font-weight:600;
+    margin-top:6px;
+  }
+  .folder-badge::before{content:'●';font-size:8px;}
+
+  .secret-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    gap:14px;padding:0 16px;margin-bottom:20px;
+  }
+  .secret-app .app-icon-img{width:52px;height:52px;border-radius:14px;font-size:22px;}
+  .secret-app .app-icon-label{font-size:9.5px;color:rgba(255,255,255,0.75);text-align:center;}
+  .secret-app{display:flex;flex-direction:column;align-items:center;gap:5px;}
+
+  .folder-info{
+    margin:0 16px;
+    background:rgba(29,184,115,0.1);
+    border:1px solid rgba(29,184,115,0.25);
+    border-radius:14px;padding:12px 14px;
+  }
+  .folder-info-row{
+    display:flex;justify-content:space-between;
+    font-size:10.5px;margin-bottom:6px;
+  }
+  .folder-info-row:last-child{margin-bottom:0;}
+  .folder-info-key{color:rgba(255,255,255,0.5);}
+  .folder-info-val{color:#1DB873;font-weight:600;}
+
+  .reset-btn{
+    display:block;margin:16px auto 0;
+    padding:8px 22px;font-size:12px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:20px;cursor:pointer;color:rgba(255,255,255,0.7);
+  }
+  .reset-btn:hover{background:rgba(255,255,255,0.14);}
+
+  /* ── Panel Altı – Adımlar ── */
+  .steps-panel{
+    width:300px;margin-top:14px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:18px;padding:14px 16px;
+  }
+  .steps-panel h3{
+    font-size:12px;font-weight:600;color:rgba(255,255,255,0.7);
+    letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase;
+  }
+  .step-row{
+    display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;
+  }
+  .step-num{
+    width:22px;height:22px;border-radius:50%;
+    background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+    font-size:11px;font-weight:700;color:rgba(255,255,255,0.6);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    transition:background .3s,color .3s,border-color .3s;
+  }
+  .step-num.active{background:#1DB873;color:#fff;border-color:#1DB873;}
+  .step-num.done{background:rgba(29,184,115,0.3);color:#1DB873;border-color:#1DB873;}
+  .step-text{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.5;padding-top:3px;
+    transition:color .3s;}
+  .step-text.active{color:rgba(255,255,255,0.9);}
+  .step-text strong{color:#1DB873;}
+
+  /* DTW Bar */
+  .dtw-wrap{
+    margin-top:10px;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;
+  }
+  .dtw-label{
+    display:flex;justify-content:space-between;
+    font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:5px;
+  }
+  .dtw-track{
+    background:rgba(255,255,255,0.08);border-radius:4px;height:6px;overflow:hidden;
+  }
+  #dtw-fill{height:100%;width:0%;background:linear-gradient(90deg,#1DB873,#00e5a0);
+    border-radius:4px;transition:width .6s ease;}
+
+  /* ── Başlat Butonu ── */
+  .start-btn-wrap{text-align:center;padding:14px 0 0;}
+  #demo-btn{
+    padding:10px 28px;font-size:13px;font-weight:600;
+    background:linear-gradient(135deg,#1DB873,#16a364);
+    color:#fff;border:none;border-radius:22px;cursor:pointer;
+    box-shadow:0 4px 18px rgba(29,184,115,0.4);
+    transition:opacity .2s,transform .1s;
+    letter-spacing:.3px;
+  }
+  #demo-btn:hover{opacity:.92;}
+  #demo-btn:active{transform:scale(.97);}
+  #demo-btn:disabled{background:#555;box-shadow:none;cursor:default;}
+
+  /* ── Animasyonlar ── */
+  @keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(400%)}}
+  @keyframes fadeSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+  @keyframes successPop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  @keyframes fingerPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(29,184,115,0)}50%{box-shadow:0 0 16px 4px rgba(29,184,115,0.35)}}
+
+  .fade-in{animation:fadeSlide .4s ease forwards;}
 </style>
+</head>
+<body>
 
-<div style="padding:1rem 0;max-width:480px;margin:0 auto">
+<div class="page-title">
+  <h1>🛡️ InvisibleShield – SGBA Demo</h1>
+  <p>Stealth Gesture-Based Access · One UI Security Layer</p>
+</div>
 
-  <div id="phase-gesture">
-    <div style="background:#f7f7f7;border-radius:12px;border:1px solid #ddd;padding:14px;margin-bottom:12px;overflow:hidden">
-      <div style="font-size:11px;color:#888;margin-bottom:8px;text-align:center">Home screen · gesture drawing (zero visual trace)</div>
-      <svg id="gesture-svg" width="100%" viewBox="0 0 320 190" style="display:block;overflow:visible">
-        <g id="icon-grid">
-          <rect x="20" y="14" width="42" height="42" rx="11" fill="rgba(26,115,232,0.15)" stroke="rgba(26,115,232,0.3)" stroke-width="1"/>
-          <rect x="76" y="14" width="42" height="42" rx="11" fill="rgba(52,168,83,0.15)" stroke="rgba(52,168,83,0.3)" stroke-width="1"/>
-          <rect x="132" y="14" width="42" height="42" rx="11" fill="rgba(234,67,53,0.15)" stroke="rgba(234,67,53,0.3)" stroke-width="1"/>
-          <rect x="188" y="14" width="42" height="42" rx="11" fill="rgba(251,188,4,0.15)" stroke="rgba(251,188,4,0.3)" stroke-width="1"/>
-          <rect x="244" y="14" width="42" height="42" rx="11" fill="rgba(156,39,176,0.15)" stroke="rgba(156,39,176,0.3)" stroke-width="1"/>
-          <rect x="20" y="70" width="42" height="42" rx="11" fill="rgba(0,150,136,0.15)" stroke="rgba(0,150,136,0.3)" stroke-width="1"/>
-          <rect x="76" y="70" width="42" height="42" rx="11" fill="rgba(96,125,139,0.15)" stroke="rgba(96,125,139,0.3)" stroke-width="1"/>
-          <rect x="132" y="70" width="42" height="42" rx="11" fill="rgba(255,87,34,0.15)" stroke="rgba(255,87,34,0.3)" stroke-width="1"/>
-          <rect x="188" y="70" width="42" height="42" rx="11" fill="rgba(33,150,243,0.15)" stroke="rgba(33,150,243,0.3)" stroke-width="1"/>
-          <rect x="244" y="70" width="42" height="42" rx="11" fill="rgba(76,175,80,0.15)" stroke="rgba(76,175,80,0.3)" stroke-width="1"/>
-          <rect x="20" y="126" width="42" height="42" rx="11" fill="rgba(233,30,99,0.15)" stroke="rgba(233,30,99,0.3)" stroke-width="1"/>
-          <rect x="76" y="126" width="42" height="42" rx="11" fill="rgba(103,58,183,0.15)" stroke="rgba(103,58,183,0.3)" stroke-width="1"/>
-          <rect x="132" y="126" width="42" height="42" rx="11" fill="rgba(0,188,212,0.15)" stroke="rgba(0,188,212,0.3)" stroke-width="1"/>
-          <rect x="188" y="126" width="42" height="42" rx="11" fill="rgba(255,152,0,0.15)" stroke="rgba(255,152,0,0.3)" stroke-width="1"/>
-          <rect x="244" y="126" width="42" height="42" rx="11" fill="rgba(63,81,181,0.15)" stroke="rgba(63,81,181,0.3)" stroke-width="1"/>
-        </g>
-        <path id="gpath" d="M70 148 L250 148 L70 175 L250 175" fill="none" stroke="#1DB873" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="600" stroke-dashoffset="600" opacity="0"/>
-        <circle id="finger-dot" cx="70" cy="148" r="5" fill="#1DB873" opacity="0"/>
-      </svg>
-    </div>
+<!-- TELEFON ÇERÇEVESİ -->
+<div class="phone-wrap">
+  <div class="phone-frame">
+    <div class="phone-screen">
 
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
-      <div class="step-dot active" id="dot1"></div>
-      <div class="step-dot" id="dot2"></div>
-      <div class="step-dot" id="dot3"></div>
-      <div class="step-dot" id="dot4"></div>
-    </div>
-    <div id="status-text" style="margin-bottom:10px">Press the button to start the demo</div>
-    <div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:#777;margin-bottom:4px">
-        <span>DTW similarity score</span><span id="dtw-pct">0%</span>
-      </div>
-      <div style="background:#e8e8e8;border-radius:4px;height:6px;overflow:hidden;border:1px solid #ccc">
-        <div id="dtw-bar" style="height:100%;width:0%;background:#1DB873;border-radius:4px"></div>
-      </div>
-    </div>
-    <div style="text-align:center">
-      <button id="demo-btn" onclick="startDemo()" style="padding:9px 24px;font-size:13px;background:#1DB873;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:500">Start Demo</button>
-    </div>
-  </div>
-
-  <div id="phase-pin" style="display:none;animation:fadeIn .4s ease">
-    <div id="pin-box" style="background:#fff;border-radius:12px;border:1.5px solid #ddd;padding:22px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-      <div style="font-size:14px;font-weight:500;color:#111;margin-bottom:4px">Hidden Panel Lock</div>
-      <div style="font-size:11px;color:#777;margin-bottom:20px">Enter PIN or unlock with fingerprint</div>
-
-      <div id="pin-dots" style="display:flex;justify-content:center;gap:14px;margin-bottom:20px">
-        <div class="pin-dot" id="pd0"></div>
-        <div class="pin-dot" id="pd1"></div>
-        <div class="pin-dot" id="pd2"></div>
-        <div class="pin-dot" id="pd3"></div>
+      <!-- Dinamik Ada -->
+      <div class="dynamic-island">
+        <div class="di-dot"></div>
+        <div class="di-cam"></div>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:210px;margin:0 auto 22px">
-        <div class="pin-btn" onclick="pinPress('1')">1</div>
-        <div class="pin-btn" onclick="pinPress('2')">2</div>
-        <div class="pin-btn" onclick="pinPress('3')">3</div>
-        <div class="pin-btn" onclick="pinPress('4')">4</div>
-        <div class="pin-btn" onclick="pinPress('5')">5</div>
-        <div class="pin-btn" onclick="pinPress('6')">6</div>
-        <div class="pin-btn" onclick="pinPress('7')">7</div>
-        <div class="pin-btn" onclick="pinPress('8')">8</div>
-        <div class="pin-btn" onclick="pinPress('9')">9</div>
-        <div class="pin-btn" onclick="pinClear()" style="font-size:16px">⌫</div>
-        <div class="pin-btn" onclick="pinPress('0')">0</div>
-        <div class="pin-btn" onclick="pinClear()" style="font-size:11px;color:#666">Del</div>
+      <!-- Durum Çubuğu -->
+      <div class="status-bar">
+        <div class="status-time" id="clock">09:41</div>
+        <div class="status-icons">
+          <div class="signal-bars">
+            <span style="height:4px"></span>
+            <span style="height:6px"></span>
+            <span style="height:9px"></span>
+            <span style="height:12px"></span>
+          </div>
+          <svg viewBox="0 0 24 24"><path d="M1 6l5 5 6-6 6 6 5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"/><path d="M22 11v2" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
       </div>
 
-      <div style="border-top:1px solid #eee;padding-top:18px">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-          <div style="position:relative;width:68px;height:68px">
-            <div id="fp-ripple1"></div>
-            <div id="fp-ripple2"></div>
-            <div id="fp-btn"
-              onmousedown="fpStart()" onmouseup="fpStop()" onmouseleave="fpStop()"
-              ontouchstart="fpStart(event)" ontouchend="fpStop()" ontouchcancel="fpStop()">
-              <div class="fp-ring" id="fp-ring"></div>
-              <div id="fp-scan"></div>
-              <div id="fp-progress"></div>
-              <svg id="fp-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.4" stroke-linecap="round">
-                <path d="M12 1C8 1 5 4 5 8"/>
-                <path d="M19 8c0-3.87-3.13-7-7-7"/>
-                <path d="M12 7c-1.1 0-2 .9-2 2v3"/>
-                <path d="M12 7c1.1 0 2 .9 2 2v3c0 1.1-.9 2-2 2"/>
-                <path d="M8 12v-2"/>
-                <path d="M16 12v-1"/>
-                <path d="M6 14c0 3.31 2.69 6 6 6"/>
-                <path d="M18 14c0 1.2-.35 2.32-.96 3.26"/>
-                <path d="M12 20v-4"/>
-              </svg>
-              <svg id="fp-check" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1DB873" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;animation:successPop .4s ease">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            </div>
+      <!-- ══════ ANA EKRAN ══════ -->
+      <div id="screen-home">
+        <!-- Saat Widget -->
+        <div class="home-widget">
+          <div class="widget-time" id="widget-clock">09:41</div>
+          <div class="widget-date">Saturday, June 14</div>
+          <div class="widget-weather">☀️ Istanbul · 82°F</div>
+        </div>
+
+        <!-- Uygulama Ikonları -->
+        <div class="app-grid" id="app-grid">
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#1a73e8,#0d47a1)">📸</div>
+            <div class="app-icon-label">Camera</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#34a853,#1e7e34)">💬</div>
+            <div class="app-icon-label">Messages</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#ea4335,#b71c1c)">📺</div>
+            <div class="app-icon-label">YouTube</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#fbbc04,#e65100)">🗺️</div>
+            <div class="app-icon-label">Maps</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#9c27b0,#6a1b9a)">🎵</div>
+            <div class="app-icon-label">Music</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#00bcd4,#006064)">📰</div>
+            <div class="app-icon-label">News</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#ff5722,#bf360c)">🛒</div>
+            <div class="app-icon-label">Shop</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#607d8b,#37474f)">⚙️</div>
+            <div class="app-icon-label">Settings</div>
           </div>
         </div>
+
+        <!-- Dock -->
+        <div class="dock">
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#1a73e8,#0d47a1);width:46px;height:46px;border-radius:12px;font-size:20px">📞</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#34a853,#1e7e34);width:46px;height:46px;border-radius:12px;font-size:20px">✉️</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#1a73e8,#4285f4);width:46px;height:46px;border-radius:12px;font-size:20px">🌐</div>
+          </div>
+          <div class="app-icon">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#ff9800,#e65100);width:46px;height:46px;border-radius:12px;font-size:20px">📦</div>
+          </div>
+        </div>
+
+        <div class="home-bar"></div>
+
+        <!-- Gesture SVG Katmanı -->
+        <svg id="gesture-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:30;">
+          <defs>
+            <filter id="glow-filter">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Gesture çizgisi -->
+          <path id="gpath" d="" fill="none" stroke="#1DB873" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="800" stroke-dashoffset="800"
+            opacity="0" filter="url(#glow-filter)"/>
+          <!-- Parmak noktası -->
+          <circle id="finger-dot" cx="0" cy="0" r="8" fill="rgba(29,184,115,0.3)"
+            stroke="#1DB873" stroke-width="2" opacity="0">
+          </circle>
+          <circle id="finger-core" cx="0" cy="0" r="4" fill="#1DB873" opacity="0"/>
+          <!-- Koordinat etiketleri -->
+          <text id="coord-label" x="0" y="0" font-size="9" fill="rgba(29,184,115,0.8)"
+            font-family="monospace" opacity="0"></text>
+        </svg>
+
+        <!-- Bilgi Balonu -->
+        <div class="info-bubble" id="info-bubble" style="top:52px;left:10px;right:10px;max-width:unset;">
+          <div class="tag">SGBA</div><br>
+          <span id="bubble-text">Invisible gesture detected on home screen. Zero visual trace left behind.</span>
+        </div>
       </div>
+      <!-- ══ ANA EKRAN SONU ══ -->
+
+      <!-- ══════ PIN EKRANI ══════ -->
+      <div id="screen-pin" style="display:none;">
+        <div class="pin-lock-icon">🔐</div>
+        <div class="pin-title">Hidden Panel Lock</div>
+        <div class="pin-subtitle">Gesture verified · second authentication required</div>
+
+        <!-- 1938 hint -->
+        <div class="pin-hint">
+          Demo PIN: <span>1938</span>
+        </div>
+
+        <div class="pin-dots" id="pin-dots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+
+        <div class="pin-grid">
+          <div class="pin-btn" onclick="pinPress('1')">1<span class="sub"></span></div>
+          <div class="pin-btn" onclick="pinPress('2')">2<span class="sub">ABC</span></div>
+          <div class="pin-btn" onclick="pinPress('3')">3<span class="sub">DEF</span></div>
+          <div class="pin-btn" onclick="pinPress('4')">4<span class="sub">GHI</span></div>
+          <div class="pin-btn" onclick="pinPress('5')">5<span class="sub">JKL</span></div>
+          <div class="pin-btn" onclick="pinPress('6')">6<span class="sub">MNO</span></div>
+          <div class="pin-btn" onclick="pinPress('7')">7<span class="sub">PQRS</span></div>
+          <div class="pin-btn" onclick="pinPress('8')">8<span class="sub">TUV</span></div>
+          <div class="pin-btn" onclick="pinPress('9')">9<span class="sub">WXYZ</span></div>
+          <div class="pin-btn" onclick="pinClear()" style="font-size:18px">⌫</div>
+          <div class="pin-btn" onclick="pinPress('0')">0<span class="sub">+</span></div>
+          <div class="pin-btn" style="opacity:.3;cursor:default">✕</div>
+        </div>
+
+        <div class="fp-section">
+          <div class="fp-or">— VEYA —</div>
+          <div id="fp-btn"
+            onmousedown="fpStart()" onmouseup="fpStop()" onmouseleave="fpStop()"
+            ontouchstart="fpStart(event)" ontouchend="fpStop()" ontouchcancel="fpStop()">
+            <div id="fp-scan"></div>
+            <div id="fp-progress"></div>
+            <svg id="fp-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round">
+              <path d="M12 1C8 1 5 4 5 8"/>
+              <path d="M19 8c0-3.87-3.13-7-7-7"/>
+              <path d="M12 7c-1.1 0-2 .9-2 2v3"/>
+              <path d="M12 7c1.1 0 2 .9 2 2v3c0 1.1-.9 2-2 2"/>
+              <path d="M8 12v-2"/><path d="M16 12v-1"/>
+              <path d="M6 14c0 3.31 2.69 6 6 6"/>
+              <path d="M18 14c0 1.2-.35 2.32-.96 3.26"/>
+              <path d="M12 20v-4"/>
+            </svg>
+            <svg id="fp-check" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1DB873" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;animation:successPop .4s ease">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="fp-label">Press and hold</div>
+        </div>
+      </div>
+      <!-- ══ PIN SONU ══ -->
+
+      <!-- ══════ GİZLİ PANEL ══════ -->
+      <div id="screen-folder" style="display:none;">
+        <div class="folder-header">
+          <div class="folder-title">🗂️ Hidden Panel</div>
+          <div class="folder-sub">Visible only to you · no trace detectable from outside</div>
+          <div class="folder-badge">SGBA Active · Secure</div>
+        </div>
+
+        <div class="secret-grid">
+          <div class="secret-app">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#1a73e8,#0d47a1)">🏦</div>
+            <div class="app-icon-label">Banking</div>
+          </div>
+          <div class="secret-app">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#f7931a,#c47d11)">₿</div>
+            <div class="app-icon-label">Crypto</div>
+          </div>
+          <div class="secret-app">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#9c27b0,#6a1b9a)">🔑</div>
+            <div class="app-icon-label">Passwords</div>
+          </div>
+          <div class="secret-app">
+            <div class="app-icon-img" style="background:linear-gradient(135deg,#e53935,#b71c1c)">📓</div>
+            <div class="app-icon-label">Notes</div>
+          </div>
+        </div>
+
+        <div class="folder-info">
+          <div class="folder-info-row">
+            <div class="folder-info-key">Access Method</div>
+            <div class="folder-info-val">Gesture + PIN</div>
+          </div>
+          <div class="folder-info-row">
+            <div class="folder-info-key">DTW Similarity</div>
+            <div class="folder-info-val">88% ✓</div>
+          </div>
+          <div class="folder-info-row">
+            <div class="folder-info-key">Visual Trace</div>
+            <div class="folder-info-val">Zero 🎯</div>
+          </div>
+          <div class="folder-info-row">
+            <div class="folder-info-key">External Visibility</div>
+            <div class="folder-info-val">None ✓</div>
+          </div>
+        </div>
+
+        <button class="reset-btn" onclick="resetAll()">↺ Try Again</button>
+        <div class="home-bar" style="bottom:10px;left:50%;transform:translateX(-50%);position:absolute;"></div>
+      </div>
+      <!-- ══ PANEL SONU ══ -->
+
+    </div><!-- phone-screen -->
+  </div><!-- phone-frame -->
+</div><!-- phone-wrap -->
+
+<!-- ── ADIMLAR PANELİ ── -->
+<div class="steps-panel">
+  <h3>📋 How It Works?</h3>
+
+  <div class="step-row">
+    <div class="step-num" id="sn1">1</div>
+    <div class="step-text" id="st1">
+      <strong>Invisible Gesture</strong> — Finger draws a custom shape on the home screen.
+      No one sees it, zero trace left behind.
+    </div>
+  </div>
+  <div class="step-row">
+    <div class="step-num" id="sn2">2</div>
+    <div class="step-text" id="st2">
+      <strong>Vector Mapping</strong> — X/Y coordinates are converted into a motion vector.
+    </div>
+  </div>
+  <div class="step-row">
+    <div class="step-num" id="sn3">3</div>
+    <div class="step-text" id="st3">
+      <strong>DTW Comparison</strong> — Algorithm compares against the stored reference shape.
+      85%+ similarity = match.
+    </div>
+  </div>
+  <div class="step-row">
+    <div class="step-num" id="sn4">4</div>
+    <div class="step-text" id="st4">
+      <strong>Second Authentication</strong> — Hidden panel unlocks via PIN or fingerprint.
     </div>
   </div>
 
-  <div id="phase-folder" style="display:none;animation:fadeIn .5s ease">
-    <div style="background:#fff;border-radius:12px;border:1.5px solid #ddd;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-      <div style="font-size:11px;color:#888;text-align:center;margin-bottom:14px">Hidden panel · visible only to you</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
-          <div style="width:48px;height:48px;border-radius:12px;background:rgba(26,115,232,0.18);border:1.5px solid rgba(26,115,232,0.4)"></div>
-          <div style="font-size:10px;color:#555;font-weight:500">Bank</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
-          <div style="width:48px;height:48px;border-radius:12px;background:rgba(29,184,115,0.18);border:1.5px solid rgba(29,184,115,0.4)"></div>
-          <div style="font-size:10px;color:#555;font-weight:500">Crypto</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
-          <div style="width:48px;height:48px;border-radius:12px;background:rgba(156,39,176,0.18);border:1.5px solid rgba(156,39,176,0.4)"></div>
-          <div style="font-size:10px;color:#555;font-weight:500">Passwords</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
-          <div style="width:48px;height:48px;border-radius:12px;background:rgba(234,67,53,0.18);border:1.5px solid rgba(234,67,53,0.4)"></div>
-          <div style="font-size:10px;color:#555;font-weight:500">Notes</div>
-        </div>
-      </div>
-      <div style="border-top:1px solid #eee;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:11px;color:#1DB873;font-weight:500">Folder opened · SGBA active</div>
-        <button onclick="resetAll()" style="font-size:11px;padding:5px 14px;background:#f0f0f0;border:1px solid #ccc;border-radius:6px;cursor:pointer;color:#333">Reset</button>
-      </div>
+  <div class="dtw-wrap">
+    <div class="dtw-label">
+      <span>DTW Similarity Score</span>
+      <span id="dtw-pct">0%</span>
+    </div>
+    <div class="dtw-track">
+      <div id="dtw-fill"></div>
     </div>
   </div>
 
+  <div class="start-btn-wrap">
+    <button id="demo-btn" onclick="startDemo()">▶ Start Demo</button>
+  </div>
 </div>
 
 <script>
+// Saat
+function updateClock(){
+  const now=new Date();
+  const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  const el1=document.getElementById('clock');
+  const el2=document.getElementById('widget-clock');
+  if(el1)el1.textContent=t;
+  if(el2)el2.textContent=t;
+}
+updateClock();setInterval(updateClock,30000);
+
 let running=false,pinVal='',fpTimer=null,fpHolding=false;
-const CORRECT_PIN='1938',HOLD_MS=1000;
+const CORRECT_PIN='1938',HOLD_MS=2200;
 
-function setDot(a){
+// ── Adım göstergeleri ──
+function setStep(active){
   for(let i=1;i<=4;i++){
-    const d=document.getElementById('dot'+i);
-    d.classList.remove('active','done');
-    if(i<a)d.classList.add('done');
-    if(i===a)d.classList.add('active');
+    const n=document.getElementById('sn'+i);
+    const t=document.getElementById('st'+i);
+    n.className='step-num'+(i<active?' done':i===active?' active':'');
+    t.className='step-text'+(i===active?' active':'');
   }
 }
 
-function scrollIcons(dur,shift){
-  const g=document.getElementById('icon-grid');
+// ── Gesture animasyon yolu (Z harfi gibi — rapordaki vektör) ──
+// Başlangıç: sol alt, sağa git, sol üste geç, sağa git (Z/N şekli)
+const GPOINTS=[
+  {x:58,y:370},{x:222,y:370},
+  {x:88,y:310},{x:240,y:310}
+];
+
+function makePath(pts){
+  return pts.map((p,i)=>(i===0?`M${p.x} ${p.y}`:`L${p.x} ${p.y}`)).join(' ');
+}
+
+// Parmak animasyonu boyunca noktaları gezer
+let animFrame=null;
+function animateFinger(pts,duration,onDone){
+  const fdot=document.getElementById('finger-dot');
+  const fcore=document.getElementById('finger-core');
+  const clabel=document.getElementById('coord-label');
+  const path=document.getElementById('gpath');
+
+  // Toplam uzunluk hesapla
+  let totalLen=0;
+  const segs=[];
+  for(let i=1;i<pts.length;i++){
+    const dx=pts[i].x-pts[i-1].x,dy=pts[i].y-pts[i-1].y;
+    const l=Math.sqrt(dx*dx+dy*dy);
+    segs.push({dx,dy,l,cx:pts[i-1].x,cy:pts[i-1].y});
+    totalLen+=l;
+  }
+
+  const dArr=totalLen+50;
+  path.setAttribute('d',makePath(pts));
+  path.setAttribute('stroke-dasharray',dArr);
+  path.setAttribute('stroke-dashoffset',dArr);
+  path.style.transition='none';
+  path.style.opacity='1';
+
+  fdot.setAttribute('cx',pts[0].x);fdot.setAttribute('cy',pts[0].y);
+  fcore.setAttribute('cx',pts[0].x);fcore.setAttribute('cy',pts[0].y);
+  fdot.style.opacity='1';fcore.style.opacity='1';
+
   const t0=performance.now();
-  function f(now){
-    const t=Math.min((now-t0)/dur,1);
-    const e=t<.5?2*t*t:-1+(4-2*t)*t;
-    g.setAttribute('transform',`translate(0,${-e*shift})`);
-    if(t<1)requestAnimationFrame(f);
+  function tick(now){
+    const elapsed=now-t0;
+    const prog=Math.min(elapsed/duration,1);
+    const eased=prog<.5?2*prog*prog:-1+(4-2*prog)*prog;
+    const dist=eased*totalLen;
+
+    // dashoffset
+    path.setAttribute('stroke-dashoffset',dArr-eased*totalLen);
+
+    // Parmak konumu
+    let rem=dist,cx=pts[0].x,cy=pts[0].y;
+    for(const seg of segs){
+      if(rem<=seg.l){
+        const t=rem/seg.l;
+        cx=seg.cx+seg.dx*t;cy=seg.cy+seg.dy*t;
+        break;
+      }rem-=seg.l;
+    }
+    fdot.setAttribute('cx',cx);fdot.setAttribute('cy',cy);
+    fcore.setAttribute('cx',cx);fcore.setAttribute('cy',cy);
+    clabel.setAttribute('x',cx+10);clabel.setAttribute('y',cy-8);
+    clabel.textContent=`x:${Math.round(cx)} y:${Math.round(cy)}`;
+    clabel.style.opacity='0.8';
+
+    if(prog<1){animFrame=requestAnimationFrame(tick);}
+    else{
+      fdot.style.opacity='0';fcore.style.opacity='0';
+      clabel.style.opacity='0';
+      if(onDone)onDone();
+    }
   }
-  requestAnimationFrame(f);
+  animFrame=requestAnimationFrame(tick);
 }
 
+// ── Demo başlat ──
 function startDemo(){
   if(running)return;
   running=true;
   const btn=document.getElementById('demo-btn');
-  btn.disabled=true;btn.textContent='Running...';btn.style.background='#aaa';
-  const path=document.getElementById('gpath');
-  const fdot=document.getElementById('finger-dot');
-  const bar=document.getElementById('dtw-bar');
+  btn.disabled=true;btn.textContent='⏳ Running...';
+
+  const bubble=document.getElementById('info-bubble');
+  const dtw=document.getElementById('dtw-fill');
   const pct=document.getElementById('dtw-pct');
-  path.style.strokeDashoffset='600';path.style.transition='';
-  fdot.style.opacity='0';bar.style.width='0%';pct.textContent='0%';
-  document.getElementById('icon-grid').setAttribute('transform','translate(0,0)');
-  setDot(1);
-  document.getElementById('status-text').textContent='Finger movement detected · listening for coordinates...';
+
+  dtw.style.width='0%';pct.textContent='0%';
+  setStep(1);
+
+  // Adım 1 – Gesture algılama
   setTimeout(()=>{
-    fdot.style.opacity='1';
-    path.style.opacity='1';
-    path.style.transition='stroke-dashoffset 1.5s ease';
-    path.style.strokeDashoffset='0';
-    scrollIcons(1500,28);
-    setDot(2);
-    document.getElementById('status-text').textContent='Building vector map...';
-    bar.style.width='35%';pct.textContent='35%';
-  },400);
+    bubble.querySelector('#bubble-text').textContent='Invisible gesture detected on home screen · reading coordinates...';
+    bubble.className='info-bubble show';
+    animateFinger(GPOINTS,1800,null);
+    dtw.style.width='30%';pct.textContent='30%';
+  },300);
+
+  // Adım 2 – Vektör
   setTimeout(()=>{
-    setDot(3);
-    document.getElementById('status-text').textContent='DTW algorithm comparing against reference vector...';
-    bar.style.width='72%';pct.textContent='72%';
-  },1700);
+    setStep(2);
+    bubble.querySelector('#bubble-text').textContent='Motion vector created · DTW analysis starting...';
+    dtw.style.width='55%';pct.textContent='55%';
+  },1800);
+
+  // Adım 3 – DTW
   setTimeout(()=>{
-    setDot(4);
-    document.getElementById('status-text').textContent='Match 88% · waiting for PIN or fingerprint...';
-    bar.style.width='88%';pct.textContent='88%';
-    fdot.style.opacity='0';
+    setStep(3);
+    bubble.querySelector('#bubble-text').textContent='DTW algorithm comparing against reference vector...';
+    dtw.style.width='88%';pct.textContent='88%';
   },2800);
+
+  // Adım 4 – Eşleşme
   setTimeout(()=>{
-    document.getElementById('phase-gesture').style.display='none';
-    document.getElementById('phase-pin').style.display='block';
+    setStep(4);
+    bubble.querySelector('#bubble-text').textContent='✅ Match 88% · Second authentication required.';
+  },3900);
+
+  // PIN ekranına geç
+  setTimeout(()=>{
+    bubble.className='info-bubble';
+    document.getElementById('screen-home').style.display='none';
+    document.getElementById('screen-pin').style.display='flex';
+    document.getElementById('screen-pin').className='fade-in';
     running=false;
-  },3600);
+  },4800);
 }
 
+// ── PIN ──
 function updatePinDots(){
   for(let i=0;i<4;i++){
     const d=document.getElementById('pd'+i);
     d.className='pin-dot'+(i<pinVal.length?' filled':'');
   }
 }
-
 function pinPress(ch){
   if(pinVal.length>=4)return;
   pinVal+=ch;updatePinDots();
-  if(pinVal.length===4)setTimeout(()=>checkPin(),200);
+  if(pinVal.length===4)setTimeout(checkPin,220);
 }
-
 function pinClear(){pinVal=pinVal.slice(0,-1);updatePinDots();}
-
 function checkPin(){
   if(pinVal===CORRECT_PIN){openFolder();}
   else{
     for(let i=0;i<4;i++)document.getElementById('pd'+i).className='pin-dot err';
-    const box=document.getElementById('pin-box');
-    box.style.animation='shake .4s ease';
+    const pinEl=document.getElementById('screen-pin');
+    pinEl.style.animation='shake .4s ease';
     setTimeout(()=>{
       for(let i=0;i<4;i++)document.getElementById('pd'+i).className='pin-dot';
-      box.style.animation='';pinVal='';updatePinDots();
+      pinEl.style.animation='';pinVal='';updatePinDots();
     },800);
   }
 }
 
+// ── Parmak izi ──
 function fpStart(ev){
   if(ev)ev.preventDefault();
   if(fpHolding)return;
   fpHolding=true;
   const btn=document.getElementById('fp-btn');
   const scan=document.getElementById('fp-scan');
-  const r1=document.getElementById('fp-ripple1');
-  const r2=document.getElementById('fp-ripple2');
-  const ring=document.getElementById('fp-ring');
   const prog=document.getElementById('fp-progress');
-  const icon=document.getElementById('fp-icon');
   btn.classList.add('scanning');
   scan.style.display='block';
-  r1.style.display='block';r2.style.display='block';
-  ring.style.display='block';
-  icon.setAttribute('stroke','#1DB873');
   prog.style.transition='none';prog.style.width='0%';
   requestAnimationFrame(()=>{
     prog.style.transition=`width ${HOLD_MS}ms linear`;
@@ -303,60 +859,63 @@ function fpStart(ev){
   fpTimer=setTimeout(()=>{
     if(!fpHolding)return;
     scan.style.display='none';
-    r1.style.display='none';r2.style.display='none';
-    ring.style.display='none';
-    icon.style.display='none';
-    btn.classList.remove('scanning');
-    btn.classList.add('success');
+    btn.classList.remove('scanning');btn.classList.add('success');
+    document.getElementById('fp-icon').style.display='none';
     document.getElementById('fp-check').style.display='block';
-    setTimeout(()=>openFolder(),500);
+    setTimeout(openFolder,500);
   },HOLD_MS);
 }
-
 function fpStop(){
   if(!fpHolding)return;
-  fpHolding=false;
-  clearTimeout(fpTimer);
+  fpHolding=false;clearTimeout(fpTimer);
   const btn=document.getElementById('fp-btn');
   if(btn.classList.contains('success'))return;
   btn.classList.remove('scanning');
   document.getElementById('fp-scan').style.display='none';
-  document.getElementById('fp-ripple1').style.display='none';
-  document.getElementById('fp-ripple2').style.display='none';
-  document.getElementById('fp-ring').style.display='none';
-  const prog=document.getElementById('fp-progress');
-  prog.style.transition='none';prog.style.width='0%';
-  document.getElementById('fp-icon').setAttribute('stroke','#222');
+  document.getElementById('fp-progress').style.transition='none';
+  document.getElementById('fp-progress').style.width='0%';
 }
 
+// ── Gizli Panel Aç ──
 function openFolder(){
-  document.getElementById('phase-pin').style.display='none';
-  document.getElementById('phase-folder').style.display='block';
+  document.getElementById('screen-pin').style.display='none';
+  document.getElementById('screen-folder').style.display='block';
+  document.getElementById('screen-folder').className='fade-in';
 }
 
+// ── Sıfırla ──
 function resetAll(){
+  if(animFrame)cancelAnimationFrame(animFrame);
   pinVal='';fpHolding=false;clearTimeout(fpTimer);
-  document.getElementById('phase-folder').style.display='none';
-  document.getElementById('phase-gesture').style.display='block';
-  document.getElementById('phase-pin').style.display='none';
-  const btn=document.getElementById('demo-btn');
-  btn.disabled=false;btn.textContent='Try Again';btn.style.background='#1DB873';
-  document.getElementById('dtw-bar').style.width='0%';
+
+  document.getElementById('screen-folder').style.display='none';
+  document.getElementById('screen-pin').style.display='none';
+  document.getElementById('screen-home').style.display='block';
+
+  document.getElementById('info-bubble').className='info-bubble';
+
+  const gpath=document.getElementById('gpath');
+  gpath.style.transition='none';gpath.setAttribute('stroke-dashoffset','800');gpath.style.opacity='0';
+  document.getElementById('finger-dot').style.opacity='0';
+  document.getElementById('finger-core').style.opacity='0';
+  document.getElementById('coord-label').style.opacity='0';
+
+  document.getElementById('dtw-fill').style.width='0%';
   document.getElementById('dtw-pct').textContent='0%';
-  document.getElementById('status-text').textContent='Press the button to start the demo';
-  setDot(1);updatePinDots();
-  document.getElementById('icon-grid').setAttribute('transform','translate(0,0)');
-  const path=document.getElementById('gpath');
-  path.style.transition='';path.style.strokeDashoffset='600';path.style.opacity='0';
+
+  const btn=document.getElementById('demo-btn');
+  btn.disabled=false;btn.textContent='▶ Try Again';
+
+  setStep(1);updatePinDots();
+
+  // FP reset
   const fpbtn=document.getElementById('fp-btn');
   fpbtn.classList.remove('scanning','success');
   document.getElementById('fp-icon').style.display='';
-  document.getElementById('fp-icon').setAttribute('stroke','#222');
   document.getElementById('fp-check').style.display='none';
   document.getElementById('fp-scan').style.display='none';
-  document.getElementById('fp-ripple1').style.display='none';
-  document.getElementById('fp-ripple2').style.display='none';
-  document.getElementById('fp-ring').style.display='none';
   document.getElementById('fp-progress').style.width='0%';
 }
 </script>
+</body>
+</html>
