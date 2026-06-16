@@ -3,272 +3,523 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SGBA – Security Analysis</title>
+<title>SGBA – Security Analysis v3</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #050d1a;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    min-height: 100vh;
-    padding: 24px 16px;
-    background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(0,100,255,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 100%, rgba(0,60,180,0.1) 0%, transparent 60%);
-  }
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Inter:wght@200;300;400;600&display=swap');
 
-  h2 { color: #fff; font-size: 17px; font-weight: 600; text-align: center; margin-bottom: 4px; letter-spacing: 0.3px; }
-  .subtitle { color: rgba(100,160,255,0.5); font-size: 12px; text-align: center; margin-bottom: 24px; }
+:root {
+  --bg:     #03080f;
+  --blue:   #0057ff;
+  --cyan:   #00c8ff;
+  --green:  #00e5a0;
+  --red:    #ff3a3a;
+  --amber:  #f9c74f;
+  --card:   rgba(0,40,100,0.18);
+  --border: rgba(0,100,255,0.18);
+}
 
-  .attacks { display: flex; flex-direction: column; gap: 14px; max-width: 600px; margin: 0 auto; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .attack-card {
-    background: rgba(0,40,100,0.18);
-    border: 0.5px solid rgba(0,100,255,0.18);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 2px 24px rgba(0,60,200,0.08);
-    transition: border-color 0.3s;
-  }
-  .attack-card:hover { border-color: rgba(0,140,255,0.35); }
+body {
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 32px 16px 64px;
+  overflow-x: hidden;
+  color: #fff;
+}
 
-  .attack-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
-  .attack-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-  .attack-title { font-size: 13px; font-weight: 600; color: #e8f0ff; }
-  .attack-sub { font-size: 10px; color: rgba(140,180,255,0.5); margin-top: 2px; }
-  .risk-badge { margin-left: auto; font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 600; flex-shrink: 0; }
-  .risk-high { background: rgba(231,76,60,0.18); color: #ff6b6b; border: 0.5px solid rgba(231,76,60,0.3); }
-  .risk-mid  { background: rgba(243,156,18,0.18); color: #f9c74f; border: 0.5px solid rgba(243,156,18,0.3); }
-  .risk-low  { background: rgba(0,200,120,0.12); color: #00e5a0; border: 0.5px solid rgba(0,200,120,0.3); }
+/* ─── PARTICLES ─── */
+#particles-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+}
 
-  .attack-body { padding: 0 16px 16px; }
+/* ─── HEADER ─── */
+.header {
+  text-align: center; margin-bottom: 36px;
+  position: relative; z-index: 2;
+  animation: fadeDown 0.8s ease both;
+}
+@keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
 
-  .vs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-  .vs-box { border-radius: 10px; padding: 10px 12px; }
-  .vs-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-  .vs-text { font-size: 11px; line-height: 1.6; }
-  .vs-bad { background: rgba(231,76,60,0.07); border: 0.5px solid rgba(231,76,60,0.2); }
-  .vs-bad .vs-label { color: #ff6b6b; }
-  .vs-bad .vs-text { color: rgba(200,220,255,0.55); }
-  .vs-good { background: rgba(0,140,255,0.07); border: 0.5px solid rgba(0,140,255,0.2); }
-  .vs-good .vs-label { color: #4db8ff; }
-  .vs-good .vs-text { color: rgba(200,220,255,0.55); }
+.header-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--cyan);
+  letter-spacing: 4px; text-transform: uppercase;
+  margin-bottom: 10px; display: block;
+  animation: fadeDown 0.8s 0.1s ease both;
+}
 
-  .demo-wrap { background: rgba(0,20,60,0.4); border: 0.5px solid rgba(0,100,255,0.12); border-radius: 10px; padding: 12px; }
-  .demo-title { font-size: 10px; color: rgba(100,160,255,0.5); margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.header h2 {
+  font-size: 26px; font-weight: 300; letter-spacing: 2px;
+  background: linear-gradient(135deg, #fff 30%, var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
 
-  /* ── BRUTE FORCE ── */
-  .bf-scene { display: flex; gap: 16px; align-items: flex-start; }
+/* Threat Meter */
+.threat-meter {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  margin-top: 16px;
+  animation: fadeDown 0.8s 0.3s ease both;
+}
+.tm-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:rgba(100,160,255,0.5); letter-spacing:2px; text-transform:uppercase; }
+.tm-track {
+  width: 180px; height: 6px; background: rgba(255,255,255,0.05);
+  border-radius: 3px; overflow: visible; position: relative;
+}
+.tm-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+  width: 0%;
+  transition: width 1.8s cubic-bezier(0.22,1,0.36,1);
+  box-shadow: 0 0 10px rgba(0,229,160,0.4);
+}
+.tm-needle {
+  position: absolute; top: 50%; width: 3px; height: 14px;
+  background: #fff; border-radius: 2px;
+  transform: translate(-50%,-50%);
+  transition: left 1.8s cubic-bezier(0.22,1,0.36,1);
+  box-shadow: 0 0 6px rgba(255,255,255,0.8);
+  left: 0%;
+}
+.tm-val { font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color: var(--green); min-width:40px; }
 
-  .bf-phone-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .bf-phone {
-    width: 80px;
-    background: #080f1e;
-    border-radius: 16px;
-    padding: 7px 5px 10px;
-    border: 1.5px solid rgba(0,100,255,0.25);
-    box-shadow: 0 0 18px rgba(0,80,255,0.15);
-    position: relative;
-  }
-  .bf-notch { width: 24px; height: 4px; background: #1a2540; border-radius: 4px; margin: 0 auto 5px; }
-  .bf-screen {
-    background: #0c1628;
-    border-radius: 8px;
-    width: 100%;
-    height: 100px;
-    position: relative;
-    overflow: hidden;
-    border: 0.5px solid rgba(0,100,255,0.15);
-  }
-  .bf-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+/* ─── CARDS ─── */
+.attacks { display: flex; flex-direction: column; gap: 16px; max-width: 620px; margin: 0 auto; position: relative; z-index: 2; }
 
-  .bf-right { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-  .bf-log {
-    height: 116px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding-right: 2px;
-  }
-  .bf-log::-webkit-scrollbar { width: 3px; }
-  .bf-log::-webkit-scrollbar-track { background: transparent; }
-  .bf-log::-webkit-scrollbar-thumb { background: rgba(0,100,255,0.25); border-radius: 3px; }
+.attack-card {
+  background: rgba(0,20,60,0.45);
+  border: 0.5px solid var(--border);
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 4px 40px rgba(0,60,200,0.1);
+  backdrop-filter: blur(12px);
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s, box-shadow 0.3s;
+}
+.attack-card.visible { opacity:1; transform:translateY(0); }
+.attack-card:hover { border-color: rgba(0,180,255,0.4); box-shadow: 0 8px 60px rgba(0,100,255,0.18); }
 
-  .bf-line {
-    font-size: 9px;
-    font-family: 'Courier New', monospace;
-    padding: 2px 6px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    opacity: 0;
-    transform: translateX(6px);
-    transition: all 0.2s;
-  }
-  .bf-line.show { opacity: 1; transform: translateX(0); }
-  .bf-line.fail { background: rgba(231,76,60,0.1); color: rgba(255,100,100,0.7); }
-  .bf-line.try  { background: rgba(243,156,18,0.1); color: rgba(249,199,79,0.8); }
+.attack-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px; cursor: pointer; user-select: none;
+  transition: background 0.2s;
+}
+.attack-header:hover { background: rgba(0,60,200,0.08); }
+.attack-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.attack-title { font-size: 14px; font-weight: 600; color: #e8f4ff; }
+.attack-sub { font-size: 10px; color: rgba(140,180,255,0.45); margin-top: 2px; }
 
-  .bf-counter { font-size: 9px; color: rgba(100,160,255,0.5); text-align: center; margin-top: 4px; }
-  .bf-counter b { color: #4db8ff; }
+.risk-badge { margin-left: auto; font-size: 10px; padding: 3px 12px; border-radius: 20px; font-weight: 700; flex-shrink: 0; font-family:'JetBrains Mono',monospace; letter-spacing:0.5px; }
+.risk-high { background:rgba(255,58,58,0.15); color:#ff6b6b; border:0.5px solid rgba(255,58,58,0.3); }
+.risk-mid  { background:rgba(249,199,79,0.15); color:#f9c74f; border:0.5px solid rgba(249,199,79,0.3); }
+.risk-low  { background:rgba(0,229,160,0.12); color:#00e5a0; border:0.5px solid rgba(0,229,160,0.3); }
 
-  .sim-btn {
-    width: 100%; margin-top: 8px; padding: 7px;
-    border-radius: 8px;
-    border: 0.5px solid rgba(0,120,255,0.3);
-    background: rgba(0,80,255,0.08);
-    color: rgba(150,200,255,0.8);
-    font-size: 10px; cursor: pointer;
-    transition: all 0.2s;
-  }
-  .sim-btn:hover { background: rgba(0,100,255,0.15); border-color: rgba(0,160,255,0.5); }
+.chevron { font-size:11px; color:rgba(0,140,255,0.5); margin-left:6px; transition:transform 0.3s; }
+.chevron.open { transform:rotate(180deg); }
 
-  /* Shoulder Surfing */
-  .ss-scene { display: flex; align-items: center; gap: 16px; }
-  .ss-phone { width: 90px; background: #0a0a0a; border-radius: 18px; padding: 7px 5px; border: 1.5px solid #1a2a40; flex-shrink: 0; }
-  .ss-notch { width: 28px; height: 5px; background: #1a1a2e; border-radius: 4px; margin: 0 auto 5px; }
-  .ss-screen { background: #0e1628; border-radius: 10px; padding: 5px; height: 110px; overflow: hidden; }
-  .ss-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
-  .ss-ic { width: 22px; height: 22px; border-radius: 6px; margin: 0 auto; }
-  .eye-indicator { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .eye-ring { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.4s; }
-  .eye-ring.danger { background: rgba(231,76,60,0.2); border: 1.5px solid rgba(231,76,60,0.5); }
-  .eye-ring.safe   { background: rgba(0,200,120,0.15); border: 1.5px solid rgba(0,200,120,0.4); }
-  .eye-text { font-size: 9px; font-weight: 600; text-align: center; transition: all 0.4s; }
-  .eye-text.danger { color: #ff6b6b; }
-  .eye-text.safe   { color: #00e5a0; }
-  .ss-desc { flex: 1; font-size: 10px; color: rgba(140,180,255,0.5); line-height: 1.6; }
-  .ss-toggle { display: flex; gap: 6px; margin-top: 10px; }
-  .ss-btn { flex: 1; padding: 6px; border-radius: 7px; border: 0.5px solid; font-size: 10px; cursor: pointer; transition: all 0.2s; background: transparent; }
-  .ss-btn.red-btn   { border-color: rgba(231,76,60,0.4); color: #ff6b6b; }
-  .ss-btn.red-btn.active, .ss-btn.red-btn:hover { background: rgba(231,76,60,0.15); }
-  .ss-btn.green-btn { border-color: rgba(0,200,120,0.4); color: #00e5a0; }
-  .ss-btn.green-btn.active, .ss-btn.green-btn:hover { background: rgba(0,200,120,0.1); }
+.attack-body {
+  padding: 0 18px 18px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.5s cubic-bezier(0.22,1,0.36,1), padding 0.3s;
+  padding-top: 0;
+}
+.attack-body.open { max-height: 800px; padding-top: 0; }
 
-  /* Accidental Trigger */
-  .at-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .at-item { flex: 1; min-width: 120px; background: rgba(0,30,80,0.4); border: 0.5px solid rgba(0,100,255,0.1); border-radius: 8px; padding: 10px; }
-  .at-label { font-size: 9px; color: rgba(100,160,255,0.4); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
-  .at-val { font-size: 12px; font-weight: 600; }
-  .at-bar { height: 4px; border-radius: 2px; margin-top: 4px; background: rgba(0,60,150,0.3); overflow: hidden; }
-  .at-fill { height: 100%; border-radius: 2px; transition: width 0.8s; }
+/* ─── VS ROW ─── */
+.vs-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.vs-box { border-radius:12px; padding:12px 14px; }
+.vs-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; font-family:'JetBrains Mono',monospace; }
+.vs-text { font-size:11px; line-height:1.7; color:rgba(180,210,255,0.55); }
+.vs-bad  { background:rgba(255,58,58,0.06); border:0.5px solid rgba(255,58,58,0.2); }
+.vs-bad .vs-label { color:#ff6b6b; }
+.vs-good { background:rgba(0,200,255,0.06); border:0.5px solid rgba(0,200,255,0.2); }
+.vs-good .vs-label { color:var(--cyan); }
 
-  .chevron { font-size: 12px; color: rgba(0,140,255,0.4); margin-left: auto; transition: transform 0.2s; }
-  .chevron.open { transform: rotate(180deg); }
+/* ─── DEMO WRAP ─── */
+.demo-wrap {
+  background: rgba(0,10,40,0.5); border:0.5px solid rgba(0,100,255,0.12);
+  border-radius:14px; padding:14px;
+  position: relative; overflow: hidden;
+}
+.demo-wrap::before {
+  content:'';
+  position:absolute; inset:0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,80,255,0.025) 2px, rgba(0,80,255,0.025) 4px);
+  pointer-events:none;
+}
+.demo-title { font-size:10px; color:rgba(100,160,255,0.45); margin-bottom:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; font-family:'JetBrains Mono',monospace; }
 
-  .bf-screen::after {
-    content:'';
-    position:absolute; top:0; left:0; right:0; bottom:0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,80,255,0.03) 2px, rgba(0,80,255,0.03) 4px);
-    pointer-events:none; z-index:10;
-  }
+/* ══════════════════════════════════
+   BRUTE FORCE
+══════════════════════════════════ */
+.bf-scene { display:flex; gap:16px; align-items:flex-start; }
+
+.bf-phone-wrap { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.bf-phone {
+  width: 90px; background:#060d1c; border-radius:20px;
+  padding:8px 6px 12px;
+  border:1.5px solid rgba(0,100,255,0.3);
+  box-shadow: 0 0 0 0 rgba(255,58,58,0);
+  position:relative;
+  transition: box-shadow 0.3s;
+}
+.bf-phone.shaking { animation: shake 0.35s ease; }
+@keyframes shake {
+  0%,100%{transform:translateX(0);}
+  20%{transform:translateX(-4px) rotate(-1deg);}
+  40%{transform:translateX(4px) rotate(1deg);}
+  60%{transform:translateX(-3px) rotate(-0.5deg);}
+  80%{transform:translateX(3px) rotate(0.5deg);}
+}
+.bf-phone.attack-glow { box-shadow: 0 0 18px rgba(255,58,58,0.5), 0 0 40px rgba(255,58,58,0.15); }
+.bf-phone.success-glow { box-shadow: 0 0 18px rgba(0,229,160,0.6), 0 0 40px rgba(0,229,160,0.2); }
+
+.bf-notch { width:26px; height:4px; background:#111a30; border-radius:4px; margin:0 auto 6px; }
+.bf-screen {
+  background:#080f1e; border-radius:10px;
+  width:100%; height:110px;
+  position:relative; overflow:hidden;
+  border:0.5px solid rgba(0,100,255,0.15);
+}
+.bf-canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
+
+.bf-shield {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px;
+  background:rgba(0,229,160,0.08);
+  opacity:0;
+  transition:opacity 0.5s;
+  pointer-events:none;
+}
+.bf-shield.show { opacity:1; }
+
+.matrix-overlay {
+  position:absolute; inset:0; pointer-events:none;
+  font-family:'JetBrains Mono',monospace;
+  font-size:7px; line-height:1.2;
+  overflow:hidden; opacity:0;
+  transition:opacity 0.4s;
+}
+.matrix-overlay.show { opacity:0.35; }
+
+.bf-ring-wrap { position:relative; width:44px; height:44px; margin:4px auto; }
+.bf-ring-svg { position:absolute; top:0; left:0; width:44px; height:44px; transform:rotate(-90deg); }
+.bf-ring-bg  { stroke:rgba(0,60,150,0.3); fill:none; stroke-width:3; }
+.bf-ring-fill { stroke:var(--red); fill:none; stroke-width:3; stroke-linecap:round; stroke-dasharray:120; stroke-dashoffset:120; transition:stroke-dashoffset 0.4s, stroke 0.4s; }
+.bf-ring-fill.success { stroke:var(--green); }
+.bf-ring-text { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:8px; font-family:'JetBrains Mono',monospace; color:rgba(255,255,255,0.7); }
+
+.bf-status-text { font-size:8px; font-family:'JetBrains Mono',monospace; color:rgba(255,100,100,0.6); text-align:center; margin-top:2px; min-height:12px; }
+
+.bf-right { flex:1; display:flex; flex-direction:column; gap:6px; }
+.bf-log {
+  height:126px; overflow-y:auto;
+  display:flex; flex-direction:column; gap:2px; padding-right:2px;
+  scrollbar-width:thin; scrollbar-color:rgba(0,100,255,0.25) transparent;
+}
+.bf-log::-webkit-scrollbar { width:3px; }
+.bf-log::-webkit-scrollbar-thumb { background:rgba(0,100,255,0.25); border-radius:3px; }
+
+.bf-line {
+  font-size:8.5px; font-family:'JetBrains Mono',monospace;
+  padding:2px 7px; border-radius:5px;
+  display:flex; align-items:center; gap:5px;
+  opacity:0; transform:translateX(8px);
+  transition:all 0.18s;
+}
+.bf-line.show { opacity:1; transform:translateX(0); }
+.bf-line.fail { background:rgba(255,58,58,0.1); color:rgba(255,100,100,0.75); }
+.bf-line.try  { background:rgba(249,199,79,0.1); color:rgba(249,199,79,0.85); }
+.bf-line.sys  { background:rgba(0,229,160,0.08); color:rgba(0,229,160,0.8); }
+
+.bf-counter { font-size:9px; font-family:'JetBrains Mono',monospace; color:rgba(100,160,255,0.5); }
+.bf-counter b { color:var(--cyan); }
+
+.sim-btn {
+  width:100%; margin-top:10px; padding:9px;
+  border-radius:10px; border:0.5px solid rgba(0,120,255,0.35);
+  background:rgba(0,80,255,0.08);
+  color:rgba(160,210,255,0.85);
+  font-size:10px; font-family:'JetBrains Mono',monospace;
+  letter-spacing:1px; cursor:pointer;
+  transition:all 0.25s;
+}
+.sim-btn:hover:not(:disabled) { background:rgba(0,100,255,0.18); border-color:rgba(0,180,255,0.55); }
+.sim-btn:disabled { opacity:0.45; cursor:not-allowed; }
+
+/* ══════════════════════════════════
+   SHOULDER SURFING
+══════════════════════════════════ */
+.ss-scene { display:flex; align-items:center; gap:20px; }
+.ss-phone-col { display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0; }
+
+.ss-phone {
+  width:95px; background:#0a0a0a; border-radius:20px;
+  padding:8px 6px 10px;
+  border:1.5px solid #1a2a40;
+  position:relative;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.ss-phone.danger-mode { border-color:rgba(255,58,58,0.5); box-shadow:0 0 20px rgba(255,58,58,0.2); }
+.ss-phone.safe-mode   { border-color:rgba(0,229,160,0.4); box-shadow:0 0 20px rgba(0,229,160,0.15); }
+
+.ss-notch { width:28px; height:5px; background:#1a1a2e; border-radius:4px; margin:0 auto 6px; }
+.ss-screen {
+  background:#0e1628; border-radius:12px; padding:6px;
+  height:116px; overflow:hidden; position:relative;
+}
+.ss-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+.ss-ic { width:24px; height:24px; border-radius:7px; margin:0 auto; transition:all 0.4s; }
+
+.spy-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.spy-eye-outer {
+  width:52px; height:52px; border-radius:50%;
+  position:relative; display:flex; align-items:center; justify-content:center;
+  transition:all 0.5s;
+}
+.spy-eye-outer.danger { background:rgba(255,58,58,0.15); border:1.5px solid rgba(255,58,58,0.45); box-shadow:0 0 20px rgba(255,58,58,0.25); }
+.spy-eye-outer.safe   { background:rgba(0,229,160,0.1); border:1.5px solid rgba(0,229,160,0.35); box-shadow:0 0 20px rgba(0,229,160,0.15); }
+.spy-eye-inner { font-size:24px; transition:all 0.4s; }
+
+.scan-beam {
+  position:absolute; top:50%; left:50%;
+  width:60px; height:1px;
+  background:linear-gradient(90deg, rgba(255,58,58,0.8), transparent);
+  transform-origin:left center;
+  border-radius:2px;
+  animation:scan 2s linear infinite;
+}
+@keyframes scan { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+.scan-beam.hidden { display:none; }
+
+.spy-label { font-size:9px; font-weight:700; font-family:'JetBrains Mono',monospace; transition:color 0.4s; }
+.spy-label.danger { color:#ff6b6b; }
+.spy-label.safe   { color:#00e5a0; }
+
+.attacker-pov {
+  background:rgba(255,58,58,0.05); border:0.5px solid rgba(255,58,58,0.2);
+  border-radius:8px; padding:8px 10px; margin-top:10px;
+  font-size:9px; font-family:'JetBrains Mono',monospace;
+  color:rgba(255,100,100,0.7); line-height:1.6;
+  min-height:36px; transition:all 0.4s;
+}
+.attacker-pov.safe { background:rgba(0,229,160,0.05); border-color:rgba(0,229,160,0.2); color:rgba(0,229,160,0.7); }
+
+.ss-desc { flex:1; font-size:11px; color:rgba(140,190,255,0.55); line-height:1.7; }
+.ss-toggle { display:flex; gap:8px; margin-top:12px; }
+.ss-btn {
+  flex:1; padding:8px; border-radius:9px;
+  border:0.5px solid; font-size:10px; font-family:'JetBrains Mono',monospace;
+  cursor:pointer; transition:all 0.25s; background:transparent;
+  letter-spacing:0.5px;
+}
+.ss-btn.red-btn   { border-color:rgba(255,58,58,0.35); color:#ff6b6b; }
+.ss-btn.red-btn.active   { background:rgba(255,58,58,0.15); box-shadow:0 0 12px rgba(255,58,58,0.15); }
+.ss-btn.green-btn { border-color:rgba(0,229,160,0.35); color:#00e5a0; }
+.ss-btn.green-btn.active { background:rgba(0,229,160,0.1); box-shadow:0 0 12px rgba(0,229,160,0.15); }
+
+/* ══════════════════════════════════
+   ACCIDENTAL TRIGGER
+══════════════════════════════════ */
+.at-demo { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.prox-scene { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.prox-phone {
+  width:64px; background:#060d1c; border-radius:16px;
+  padding:6px 5px 8px; border:1.5px solid rgba(0,100,255,0.25);
+  position:relative;
+}
+.prox-notch { width:18px; height:3px; background:#111a30; border-radius:3px; margin:0 auto 4px; }
+.prox-screen { background:#080f1e; border-radius:7px; height:70px; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.prox-icon { font-size:20px; }
+.prox-sensor-dot {
+  position:absolute; top:4px; right:6px;
+  width:5px; height:5px; border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 6px var(--green);
+  animation:sensorPulse 1.5s ease-in-out infinite;
+}
+@keyframes sensorPulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.5;transform:scale(1.5);} }
+
+.finger-wrap { position:relative; width:64px; height:30px; display:flex; align-items:center; justify-content:center; }
+.finger {
+  font-size:20px; position:absolute;
+  transition:transform 1.2s cubic-bezier(0.22,1,0.36,1), opacity 0.3s;
+}
+.finger.far    { transform:translateY(10px); opacity:0.3; }
+.finger.near   { transform:translateY(-4px); opacity:1; }
+.finger.blocked{ transform:translateY(-1px); opacity:0.6; }
+
+.prox-status {
+  font-size:8px; font-family:'JetBrains Mono',monospace;
+  text-align:center; min-height:14px; transition:color 0.4s;
+}
+
+.filters-panel { display:flex; flex-direction:column; gap:8px; }
+.filter-item { background:rgba(0,30,80,0.4); border:0.5px solid rgba(0,100,255,0.1); border-radius:10px; padding:10px 12px; }
+.fi-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.fi-name { font-size:9px; font-family:'JetBrains Mono',monospace; color:rgba(100,160,255,0.55); text-transform:uppercase; letter-spacing:0.5px; }
+.fi-val  { font-size:11px; font-weight:600; }
+.fi-bar  { height:4px; border-radius:2px; background:rgba(0,60,150,0.3); overflow:hidden; }
+.fi-fill { height:100%; border-radius:2px; width:0%; transition:width 1.4s cubic-bezier(0.22,1,0.36,1); }
+
+.trigger-warn {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,58,58,0.06); border:0.5px solid rgba(255,58,58,0.15);
+  border-radius:8px; padding:8px 10px; margin-top:10px;
+  font-size:9.5px; color:rgba(255,100,100,0.7);
+  font-family:'JetBrains Mono',monospace;
+}
+.warn-dot { width:6px; height:6px; border-radius:50%; background:var(--red); animation:sensorPulse 1s ease-in-out infinite; flex-shrink:0; }
 </style>
 </head>
 <body>
 
-<h2>SGBA — Security Analysis</h2>
-<div class="subtitle">Possible attack vectors and SGBA's defense mechanisms</div>
+<canvas id="particles-bg"></canvas>
+
+<div class="header">
+  <span class="header-tag">// Attack Vector Analysis</span>
+  <h2>SGBA — Security Analysis</h2>
+  <p style="font-size:12px;color:rgba(100,160,255,0.4);margin-top:6px">Possible attack vectors and SGBA's defence mechanisms</p>
+
+  <div class="threat-meter">
+    <span class="tm-label">Overall Risk</span>
+    <div class="tm-track">
+      <div class="tm-fill" id="tm-fill"></div>
+      <div class="tm-needle" id="tm-needle"></div>
+    </div>
+    <div class="tm-val" id="tm-val">—</div>
+  </div>
+</div>
 
 <div class="attacks">
 
-  <!-- BRUTE FORCE -->
-  <div class="attack-card">
+  <!-- ══ BRUTE FORCE ══ -->
+  <div class="attack-card" id="card-bf">
     <div class="attack-header" onclick="toggle('bf')">
-      <div class="attack-icon" style="background:rgba(231,76,60,0.12)">🔓</div>
+      <div class="attack-icon" style="background:rgba(255,58,58,0.12)">🔓</div>
       <div>
         <div class="attack-title">Brute Force Attack</div>
-        <div class="attack-sub">Attempting to crack by trying all combinations</div>
+        <div class="attack-sub">Attempting to crack the lock by trying every possible combination</div>
       </div>
       <div class="risk-badge risk-low">Very Low Risk</div>
-      <div class="chevron open" id="chev-bf">▼</div>
+      <span class="chevron open" id="chev-bf">▼</span>
     </div>
-    <div class="attack-body" id="body-bf">
+    <div class="attack-body open" id="body-bf">
       <div class="vs-row">
         <div class="vs-box vs-bad">
           <div class="vs-label">Classic PIN / Password</div>
-          <div class="vs-text">10,000 combinations (4 digits). Visual error feedback. Attacker can track progress.</div>
+          <div class="vs-text">10,000 combinations (4 digits). Failed attempts give visible feedback. Attacker can track their progress.</div>
         </div>
         <div class="vs-box vs-good">
           <div class="vs-label">SGBA Gesture</div>
-          <div class="vs-text">Free vector space = astronomical combinations. Zero feedback on wrong attempt. Attacker has no idea where they stand.</div>
+          <div class="vs-text">Free vector space = astronomical combinations. Zero feedback on wrong attempts. Attacker has no idea where they stand.</div>
         </div>
       </div>
       <div class="demo-wrap">
-        <div class="demo-title">⚔️ Simulation — Real-Time Attack</div>
+        <div class="demo-title">⚔️ Simulation — Real-Time Brute Force Attack</div>
         <div class="bf-scene">
 
           <!-- Phone -->
           <div class="bf-phone-wrap">
-            <div class="bf-phone">
+            <div class="bf-phone" id="bf-phone">
               <div class="bf-notch"></div>
               <div class="bf-screen">
                 <canvas class="bf-canvas" id="bf-canvas"></canvas>
+                <div class="bf-shield" id="bf-shield">🛡️</div>
+                <div class="matrix-overlay" id="matrix-overlay"></div>
               </div>
             </div>
-            <div style="font-size:8px;color:rgba(255,100,100,0.6);text-align:center;margin-top:2px" id="bf-phone-status">Waiting</div>
+            <div class="bf-ring-wrap">
+              <svg class="bf-ring-svg" viewBox="0 0 44 44">
+                <circle class="bf-ring-bg" cx="22" cy="22" r="18"/>
+                <circle class="bf-ring-fill" id="bf-ring-fill" cx="22" cy="22" r="18"/>
+              </svg>
+              <div class="bf-ring-text" id="bf-ring-text">0%</div>
+            </div>
+            <div class="bf-status-text" id="bf-phone-status">Standby</div>
           </div>
 
           <!-- Log panel -->
           <div class="bf-right">
             <div class="bf-log" id="bf-log">
-              <div style="font-size:9px;color:rgba(100,160,255,0.3);font-style:italic;padding:4px">Click the button to start the simulation…</div>
+              <div style="font-size:8.5px;color:rgba(100,160,255,0.3);font-style:italic;padding:4px;font-family:'JetBrains Mono',monospace">
+                Click the button below to start the simulation…
+              </div>
             </div>
-            <div class="bf-counter" id="bf-counter">Attempts: <b>0</b> · Result: <b style="color:#ff6b6b">—</b></div>
+            <div class="bf-counter" id="bf-counter">Attempts: <b>0</b> &nbsp;·&nbsp; Result: <b style="color:#ff6b6b">—</b></div>
           </div>
         </div>
-        <button class="sim-btn" id="bf-btn" onclick="startBF()">▶ Start Attack</button>
+        <button class="sim-btn" id="bf-btn" onclick="startBF()">▶ &nbsp;Launch Attack</button>
       </div>
     </div>
   </div>
 
-  <!-- SHOULDER SURFING -->
-  <div class="attack-card">
+  <!-- ══ SHOULDER SURFING ══ -->
+  <div class="attack-card" id="card-ss">
     <div class="attack-header" onclick="toggle('ss')">
-      <div class="attack-icon" style="background:rgba(243,156,18,0.12)">👁️</div>
+      <div class="attack-icon" style="background:rgba(249,199,79,0.12)">👁️</div>
       <div>
         <div class="attack-title">Shoulder Surfing</div>
-        <div class="attack-sub">Learning the gesture by watching the user</div>
+        <div class="attack-sub">Learning the unlock gesture by watching the user</div>
       </div>
       <div class="risk-badge risk-mid">Medium Risk</div>
-      <div class="chevron open" id="chev-ss">▼</div>
+      <span class="chevron open" id="chev-ss">▼</span>
     </div>
-    <div class="attack-body" id="body-ss">
+    <div class="attack-body open" id="body-ss">
       <div class="vs-row">
         <div class="vs-box vs-bad">
           <div class="vs-label">Classic Method</div>
-          <div class="vs-text">Visual trail on screen. Someone watching from behind can clearly see the pattern. A single observation is enough.</div>
+          <div class="vs-text">Visible pattern on screen. A bystander can clearly see the shape. A single observation is enough.</div>
         </div>
         <div class="vs-box vs-good">
           <div class="vs-label">SGBA</div>
-          <div class="vs-text">Zero trail on screen. Only finger movement can be observed. Knox biometric 2nd layer can be added.</div>
+          <div class="vs-text">Zero trace on screen. Only the finger movement can be observed. Knox biometric can be added as a second layer.</div>
         </div>
       </div>
       <div class="demo-wrap">
-        <div class="demo-title">Scenario — What does the observer see?</div>
+        <div class="demo-title">🕵️ Scenario — What does the observer see?</div>
         <div class="ss-scene">
-          <div class="ss-phone">
-            <div class="ss-notch"></div>
-            <div class="ss-screen" id="ss-screen">
-              <div class="ss-grid" id="ss-grid"></div>
+
+          <div class="ss-phone-col">
+            <div class="ss-phone danger-mode" id="ss-phone">
+              <div class="ss-notch"></div>
+              <div class="ss-screen" id="ss-screen">
+                <div class="ss-grid" id="ss-grid"></div>
+              </div>
+            </div>
+            <div class="attacker-pov" id="attacker-pov">
+              👤 Observer: "There's a Secure Folder —<br>they're definitely hiding something!"
             </div>
           </div>
-          <div class="eye-indicator">
-            <div class="eye-ring danger" id="eye-ring">👁️</div>
-            <div class="eye-text danger" id="eye-text">Visible</div>
+
+          <div class="spy-wrap">
+            <div class="spy-eye-outer danger" id="spy-eye">
+              <div class="spy-eye-inner">👁️</div>
+              <div class="scan-beam" id="scan-beam"></div>
+            </div>
+            <div class="spy-label danger" id="spy-label">TRACKING</div>
           </div>
-          <div class="ss-desc" id="ss-desc">Classic Secure Folder: the observer clearly sees the icon and asks "what are you hiding?"</div>
-        </div>
-        <div class="ss-toggle">
-          <button class="ss-btn red-btn active" id="ss-btn-bad" onclick="ssSwitch('bad')">Classic Method</button>
-          <button class="ss-btn green-btn" id="ss-btn-good" onclick="ssSwitch('good')">With SGBA</button>
+
+          <div style="flex:1">
+            <div class="ss-desc" id="ss-desc">
+              Classic Secure Folder: the observer <b style="color:#ff6b6b">clearly sees the icon</b> and grows suspicious. A single observation is enough to launch an attack.
+            </div>
+            <div class="ss-toggle">
+              <button class="ss-btn red-btn active" id="ss-btn-bad" onclick="ssSwitch('bad')">Classic Method</button>
+              <button class="ss-btn green-btn" id="ss-btn-good" onclick="ssSwitch('good')">With SGBA</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ACCIDENTAL TRIGGER -->
-  <div class="attack-card">
+  <!-- ══ ACCIDENTAL TRIGGER ══ -->
+  <div class="attack-card" id="card-at">
     <div class="attack-header" onclick="toggle('at')">
       <div class="attack-icon" style="background:rgba(0,140,255,0.12)">⚡</div>
       <div>
@@ -276,36 +527,71 @@
         <div class="attack-sub">Risk of a random touch opening the hidden panel</div>
       </div>
       <div class="risk-badge risk-low">Low Risk</div>
-      <div class="chevron open" id="chev-at">▼</div>
+      <span class="chevron open" id="chev-at">▼</span>
     </div>
-    <div class="attack-body" id="body-at">
+    <div class="attack-body open" id="body-at">
       <div class="vs-row">
         <div class="vs-box vs-bad">
           <div class="vs-label">Risk Scenario</div>
-          <div class="vs-text">A finger slip in a pocket or a quick touch may be interpreted as a gesture.</div>
+          <div class="vs-text">An accidental finger slip or rapid touch inside a pocket could be misread as a valid gesture.</div>
         </div>
         <div class="vs-box vs-good">
           <div class="vs-label">SGBA Solution</div>
-          <div class="vs-text">Speed filter + Proximity Sensor double shield. When pocket is detected, the system enters sleep mode.</div>
+          <div class="vs-text">Speed filter + Proximity Sensor dual shield. When a pocket is detected, the system enters sleep mode.</div>
         </div>
       </div>
       <div class="demo-wrap">
-        <div class="demo-title">Security Filters</div>
-        <div class="at-row">
-          <div class="at-item">
-            <div class="at-label">Speed Filter</div>
-            <div class="at-val" style="color:#00e5a0">Active</div>
-            <div class="at-bar"><div class="at-fill" style="width:85%;background:linear-gradient(90deg,#0066ff,#00e5a0)"></div></div>
+        <div class="demo-title">⚡ Live Sensor Simulation</div>
+        <div class="at-demo">
+
+          <!-- proximity demo -->
+          <div class="prox-scene">
+            <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:rgba(100,160,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Proximity Sensor</div>
+            <div class="prox-phone">
+              <div class="prox-notch"></div>
+              <div class="prox-screen">
+                <div class="prox-icon">🔒</div>
+                <div class="prox-sensor-dot" id="prox-dot"></div>
+              </div>
+            </div>
+            <div class="finger-wrap">
+              <div class="finger far" id="prox-finger">☝️</div>
+            </div>
+            <div class="prox-status" id="prox-status" style="color:rgba(0,229,160,0.7)">Sensor active — standing by</div>
           </div>
-          <div class="at-item">
-            <div class="at-label">Proximity Sensor</div>
-            <div class="at-val" style="color:#00e5a0">Active</div>
-            <div class="at-bar"><div class="at-fill" style="width:100%;background:linear-gradient(90deg,#0066ff,#00e5a0)"></div></div>
-          </div>
-          <div class="at-item">
-            <div class="at-label">Accidental Trigger Risk</div>
-            <div class="at-val" style="color:#00e5a0">0.3%</div>
-            <div class="at-bar"><div class="at-fill" style="width:3%;background:#ff6b6b"></div></div>
+
+          <!-- filters -->
+          <div class="filters-panel">
+            <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:rgba(100,160,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Security Filters</div>
+
+            <div class="filter-item">
+              <div class="fi-top">
+                <div class="fi-name">Speed Filter</div>
+                <div class="fi-val" style="color:var(--green)">Active</div>
+              </div>
+              <div class="fi-bar"><div class="fi-fill" id="fi-speed" style="background:linear-gradient(90deg,var(--blue),var(--green))"></div></div>
+            </div>
+
+            <div class="filter-item">
+              <div class="fi-top">
+                <div class="fi-name">Proximity Guard</div>
+                <div class="fi-val" style="color:var(--green)">Active</div>
+              </div>
+              <div class="fi-bar"><div class="fi-fill" id="fi-prox" style="background:linear-gradient(90deg,var(--blue),var(--cyan))"></div></div>
+            </div>
+
+            <div class="filter-item">
+              <div class="fi-top">
+                <div class="fi-name">Accidental Trigger Risk</div>
+                <div class="fi-val" style="color:var(--green)">0.3%</div>
+              </div>
+              <div class="fi-bar"><div class="fi-fill" id="fi-risk" style="background:var(--red); width:3%"></div></div>
+            </div>
+
+            <div class="trigger-warn">
+              <div class="warn-dot"></div>
+              <span>Pocket detected → System entered sleep mode</span>
+            </div>
           </div>
         </div>
       </div>
@@ -315,173 +601,273 @@
 </div>
 
 <script>
-/* ── toggle (all open by default) ── */
-function toggle(id) {
-  const body = document.getElementById('body-' + id);
-  const chev = document.getElementById('chev-' + id);
-  const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
-  chev.classList.toggle('open', !isOpen);
-}
-['bf','ss','at'].forEach(id => {
-  document.getElementById('body-' + id).style.display = 'block';
+/* ══════════════════════════════
+   PARTICLES BG
+══════════════════════════════ */
+(function() {
+  const c = document.getElementById('particles-bg');
+  const ctx = c.getContext('2d');
+  let W, H, particles;
+
+  function init() {
+    W = c.width  = window.innerWidth;
+    H = c.height = window.innerHeight;
+    particles = Array.from({length:55}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      vx:(Math.random()-0.5)*0.25, vy:(Math.random()-0.5)*0.25,
+      r: Math.random()*1.2+0.3,
+      a: Math.random()
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(0,130,255,${p.a*0.4})`;
+      ctx.fill();
+    });
+    particles.forEach((p,i) => {
+      for(let j=i+1;j<particles.length;j++) {
+        const q = particles[j];
+        const d = Math.hypot(p.x-q.x, p.y-q.y);
+        if(d<110) {
+          ctx.beginPath();
+          ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle = `rgba(0,100,255,${(1-d/110)*0.07})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', init);
+  init(); draw();
+})();
+
+/* ══════════════════════════════
+   THREAT METER
+══════════════════════════════ */
+setTimeout(() => {
+  const val    = 12;
+  const fill   = document.getElementById('tm-fill');
+  const needle = document.getElementById('tm-needle');
+  const label  = document.getElementById('tm-val');
+  fill.style.width   = val + '%';
+  needle.style.left  = val + '%';
+  label.textContent  = val + '%';
+  label.style.color  = '#00e5a0';
+}, 600);
+
+/* ══════════════════════════════
+   CARD STAGGER ENTRANCE
+══════════════════════════════ */
+const cards = document.querySelectorAll('.attack-card');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+cards.forEach((c,i) => {
+  c.style.transitionDelay = (i * 0.12) + 's';
+  obs.observe(c);
 });
 
 /* ══════════════════════════════
-   BRUTE FORCE — Phone Canvas
-═══════════════════════════════ */
-const canvas = document.getElementById('bf-canvas');
-const ctx = canvas.getContext('2d');
-
-function resizeCanvas() {
-  canvas.width  = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-}
-resizeCanvas();
-
-function randomGesturePath(w, h) {
-  const types = ['zigzag','circle','swipe','spiral','random'];
-  const type  = types[Math.floor(Math.random() * types.length)];
-  const pts   = [];
-
-  if (type === 'swipe') {
-    const y = h * (0.2 + Math.random() * 0.6);
-    const x0 = w * 0.1, x1 = w * 0.9;
-    for (let t = 0; t <= 1; t += 0.05)
-      pts.push({ x: x0 + (x1 - x0) * t, y: y + Math.sin(t * Math.PI * 4) * 6 });
-  } else if (type === 'zigzag') {
-    const steps = 5 + Math.floor(Math.random() * 4);
-    for (let i = 0; i <= steps; i++) {
-      pts.push({ x: w * 0.1 + (w * 0.8 / steps) * i, y: (i % 2 === 0 ? h * 0.3 : h * 0.7) });
-    }
-  } else if (type === 'circle') {
-    const cx = w * 0.5, cy = h * 0.5, r = Math.min(w, h) * 0.3;
-    for (let a = 0; a <= Math.PI * 2; a += 0.15)
-      pts.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r });
-  } else if (type === 'spiral') {
-    const cx = w * 0.5, cy = h * 0.5;
-    for (let a = 0; a <= Math.PI * 4; a += 0.15) {
-      const r = (a / (Math.PI * 4)) * Math.min(w, h) * 0.38;
-      pts.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r });
-    }
-  } else {
-    const n = 12;
-    for (let i = 0; i < n; i++)
-      pts.push({ x: w * 0.1 + Math.random() * w * 0.8, y: h * 0.1 + Math.random() * h * 0.8 });
-  }
-  return pts;
+   TOGGLE (accordion)
+══════════════════════════════ */
+function toggle(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
 }
 
-const hackColors = ['#ff3333','#ff6600','#ff0055','#ff4444','#cc0000','#ff2200'];
+/* ══════════════════════════════
+   BRUTE FORCE
+══════════════════════════════ */
+const bfCanvas = document.getElementById('bf-canvas');
+const bfCtx    = bfCanvas.getContext('2d');
 
+function resizeBFCanvas() {
+  bfCanvas.width  = bfCanvas.offsetWidth;
+  bfCanvas.height = bfCanvas.offsetHeight;
+}
+resizeBFCanvas();
+window.addEventListener('resize', resizeBFCanvas);
+
+const TOTAL_ATTEMPTS = 24;
+const CIRCUMFERENCE  = 2 * Math.PI * 18;
 let bfRunning = false;
-let bfTotal   = 0;
-let bfAnimId  = null;
+
+function updateRing(attempt, total, done) {
+  const pct      = attempt / total;
+  const offset   = CIRCUMFERENCE * (1 - pct);
+  const ringFill = document.getElementById('bf-ring-fill');
+  const ringTxt  = document.getElementById('bf-ring-text');
+  ringFill.style.strokeDashoffset = offset;
+  ringTxt.textContent = Math.round(pct * 100) + '%';
+  if (done) { ringFill.classList.add('success'); ringTxt.textContent = '✗'; }
+}
+
+function startMatrixRain() {
+  const overlay = document.getElementById('matrix-overlay');
+  overlay.classList.add('show');
+  const chars = '01ABCDEF01SGBA#!@%01';
+  overlay.innerHTML = '';
+  for (let col = 0; col < 8; col++) {
+    const span = document.createElement('div');
+    span.style.cssText = `position:absolute;left:${col*12.5}%;top:0;width:12%;color:rgba(0,229,160,0.6);writing-mode:vertical-lr;font-size:7px;animation:matrixDrop ${1+Math.random()}s linear infinite;animation-delay:${Math.random()*1}s`;
+    span.textContent = Array.from({length:10}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    overlay.appendChild(span);
+  }
+}
+
+function stopMatrixRain() {
+  const overlay = document.getElementById('matrix-overlay');
+  overlay.classList.remove('show');
+  overlay.innerHTML = '';
+}
 
 function startBF() {
   if (bfRunning) return;
   bfRunning = true;
-  bfTotal   = 0;
-  document.getElementById('bf-log').innerHTML = '';
-  document.getElementById('bf-btn').disabled  = true;
-  document.getElementById('bf-btn').textContent = '⚡ Attack in Progress...';
 
+  document.getElementById('bf-log').innerHTML = '';
+  document.getElementById('bf-btn').disabled = true;
+  document.getElementById('bf-btn').textContent = '⚡  Attack in progress...';
+  document.getElementById('bf-shield').classList.remove('show');
+  const phone = document.getElementById('bf-phone');
+  phone.classList.remove('success-glow');
+  updateRing(0, TOTAL_ATTEMPTS, false);
+
+  startMatrixRain();
+
+  const hackColors = ['#ff2222','#ff6600','#ff0044','#cc0000','#ff4400','#ff1133'];
+  const shapes     = ['◈','△','✦','⬡','⊕','⟡','◉','⬟','❖'];
   let attempt = 0;
-  const maxAttempts = 22;
 
   function nextAttempt() {
-    if (attempt >= maxAttempts) {
+    if (attempt >= TOTAL_ATTEMPTS) {
       bfRunning = false;
-      document.getElementById('bf-btn').disabled  = false;
-      document.getElementById('bf-btn').textContent = '▶ Try Again';
-      document.getElementById('bf-phone-status').textContent = '❌ Failed';
-      document.getElementById('bf-phone-status').style.color = 'rgba(255,100,100,0.7)';
-      addLog('fail', `[SYSTEM] Could not crack after ${maxAttempts} attempts — zero feedback`);
+      stopMatrixRain();
+      phone.classList.remove('attack-glow');
+      phone.classList.add('success-glow');
+      document.getElementById('bf-shield').classList.add('show');
+      document.getElementById('bf-phone-status').textContent = '🛡️ PROTECTED';
+      document.getElementById('bf-phone-status').style.color = 'rgba(0,229,160,0.85)';
       document.getElementById('bf-counter').innerHTML =
-        `Attempts: <b>${maxAttempts}</b> · Result: <b style="color:#ff6b6b">FAILED</b>`;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        `Attempts: <b>${TOTAL_ATTEMPTS}</b> &nbsp;·&nbsp; Result: <b style="color:var(--green)">FAILED — DEFENCE COMPLETE</b>`;
+      updateRing(TOTAL_ATTEMPTS, TOTAL_ATTEMPTS, true);
+      addLog('sys', `[SGBA] ${TOTAL_ATTEMPTS} attempts — not cracked. Zero feedback provided.`);
+      document.getElementById('bf-btn').disabled = false;
+      document.getElementById('bf-btn').textContent = '↺  Try Again';
       return;
     }
 
     attempt++;
-    bfTotal++;
-    const pts   = randomGesturePath(canvas.width, canvas.height);
-    const color = hackColors[Math.floor(Math.random() * hackColors.length)];
-    const shapes = ['◈','△','✦','⬡','⊕','⟡','◉','⬟'];
-    const shape  = shapes[Math.floor(Math.random() * shapes.length)];
-    const codes  = ['0x'+Math.floor(Math.random()*0xFFFF).toString(16).padStart(4,'0'),
-                    Math.floor(Math.random()*9999).toString().padStart(4,'0'),
-                    'G-'+Math.random().toString(36).substr(2,4).toUpperCase()];
-    const code = codes[Math.floor(Math.random() * codes.length)];
+    phone.classList.add('attack-glow');
+    phone.classList.remove('success-glow');
 
-    addLog('try', `${shape} Attempt #${attempt}: ${code} → trying...`);
-    document.getElementById('bf-phone-status').textContent = '🔴 Attack!';
+    const code  = 'G-' + Math.random().toString(36).substr(2,4).toUpperCase() + '-' + Math.floor(Math.random()*9999);
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    const color = hackColors[Math.floor(Math.random() * hackColors.length)];
+
+    addLog('try', `${shape} #${String(attempt).padStart(2,'0')}  ${code}  → trying`);
+    document.getElementById('bf-phone-status').textContent = '🔴 ATTACK!';
     document.getElementById('bf-phone-status').style.color = 'rgba(255,80,80,0.9)';
     document.getElementById('bf-counter').innerHTML =
-      `Attempts: <b>${attempt}</b> / ${maxAttempts} · Result: <b style="color:#f9c74f">In Progress</b>`;
+      `Attempts: <b>${attempt}</b> / ${TOTAL_ATTEMPTS} &nbsp;·&nbsp; Result: <b style="color:var(--amber)">In progress…</b>`;
 
+    updateRing(attempt, TOTAL_ATTEMPTS, false);
+
+    const pts = randomGesturePath(bfCanvas.width, bfCanvas.height);
     drawGesture(pts, color, () => {
+      const ph = document.getElementById('bf-phone');
+      ph.classList.add('shaking');
+      setTimeout(() => ph.classList.remove('shaking'), 360);
       setTimeout(() => {
-        addLog('fail', `  ↳ #${attempt} REJECTED — no feedback`);
-        const delay = 300 + Math.random() * 400;
-        setTimeout(nextAttempt, delay);
-      }, 200);
+        addLog('fail', `  ↳ #${String(attempt).padStart(2,'0')}  REJECTED — no feedback`);
+        setTimeout(nextAttempt, 280 + Math.random() * 320);
+      }, 180);
     });
   }
 
   nextAttempt();
 }
 
-function drawGesture(pts, color, onDone) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function randomGesturePath(w, h) {
+  const types = ['zigzag','circle','swipe','spiral','random','lshape'];
+  const type  = types[Math.floor(Math.random() * types.length)];
+  const pts   = [];
 
-  ctx.fillStyle = `rgba(${hexToRgb(color)}, 0.04)`;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (type === 'swipe') {
+    const y = h*(0.2+Math.random()*0.6), x0=w*0.1, x1=w*0.9;
+    for (let t=0;t<=1;t+=0.05) pts.push({x:x0+(x1-x0)*t, y:y+Math.sin(t*Math.PI*4)*7});
+  } else if (type === 'zigzag') {
+    const steps = 4+Math.floor(Math.random()*4);
+    for (let i=0;i<=steps;i++) pts.push({x:w*0.1+(w*0.8/steps)*i, y:(i%2===0?h*0.25:h*0.75)});
+  } else if (type === 'circle') {
+    const cx=w*0.5,cy=h*0.5,r=Math.min(w,h)*0.3;
+    for (let a=0;a<=Math.PI*2;a+=0.12) pts.push({x:cx+Math.cos(a)*r, y:cy+Math.sin(a)*r});
+  } else if (type === 'spiral') {
+    const cx=w*0.5,cy=h*0.5;
+    for (let a=0;a<=Math.PI*4;a+=0.12) {
+      const r=(a/(Math.PI*4))*Math.min(w,h)*0.38;
+      pts.push({x:cx+Math.cos(a)*r, y:cy+Math.sin(a)*r});
+    }
+  } else if (type === 'lshape') {
+    pts.push({x:w*0.2,y:h*0.2},{x:w*0.8,y:h*0.2},{x:w*0.8,y:h*0.8});
+  } else {
+    for (let i=0;i<10;i++) pts.push({x:w*0.1+Math.random()*w*0.8, y:h*0.1+Math.random()*h*0.8});
+  }
+  return pts;
+}
+
+function drawGesture(pts, color, onDone) {
+  bfCtx.clearRect(0, 0, bfCanvas.width, bfCanvas.height);
+  bfCtx.fillStyle = `rgba(${hexRgb(color)},0.04)`;
+  bfCtx.fillRect(0,0,bfCanvas.width,bfCanvas.height);
 
   let i = 0;
   const step = () => {
     if (i >= pts.length - 1) {
-      ctx.beginPath();
-      ctx.arc(pts[pts.length-1].x, pts[pts.length-1].y, 3, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 8;
-      ctx.fill();
-      ctx.shadowBlur = 0;
+      bfCtx.beginPath();
+      bfCtx.arc(pts[pts.length-1].x, pts[pts.length-1].y, 3.5, 0, Math.PI*2);
+      bfCtx.fillStyle = color;
+      bfCtx.shadowColor = color; bfCtx.shadowBlur = 10;
+      bfCtx.fill(); bfCtx.shadowBlur = 0;
       if (onDone) onDone();
       return;
     }
+    bfCtx.beginPath();
+    bfCtx.moveTo(pts[i].x, pts[i].y);
+    bfCtx.lineTo(pts[i+1].x, pts[i+1].y);
+    bfCtx.strokeStyle = color; bfCtx.lineWidth = 1.5;
+    bfCtx.shadowColor = color; bfCtx.shadowBlur = 7;
+    bfCtx.lineCap = 'round'; bfCtx.stroke(); bfCtx.shadowBlur = 0;
 
-    ctx.beginPath();
-    ctx.moveTo(pts[i].x, pts[i].y);
-    ctx.lineTo(pts[i+1].x, pts[i+1].y);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 6;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    ctx.beginPath();
-    ctx.arc(pts[i+1].x, pts[i+1].y, 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 10;
-    ctx.fill();
-    ctx.shadowBlur = 0;
+    bfCtx.beginPath();
+    bfCtx.arc(pts[i+1].x, pts[i+1].y, 2.5, 0, Math.PI*2);
+    bfCtx.fillStyle = '#fff';
+    bfCtx.shadowColor = color; bfCtx.shadowBlur = 12;
+    bfCtx.fill(); bfCtx.shadowBlur = 0;
 
     i++;
-    setTimeout(step, 18 + Math.random() * 12);
+    setTimeout(step, 14 + Math.random()*10);
   };
   step();
 }
 
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return `${r},${g},${b}`;
+function hexRgb(hex) {
+  return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`;
 }
 
 function addLog(type, text) {
@@ -494,7 +880,20 @@ function addLog(type, text) {
   log.scrollTop = log.scrollHeight;
 }
 
-/* ── Shoulder Surfing ── */
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  @keyframes matrixDrop {
+    0%   { transform: translateY(-100%); opacity:0; }
+    10%  { opacity:1; }
+    90%  { opacity:0.6; }
+    100% { transform: translateY(200%); opacity:0; }
+  }
+`;
+document.head.appendChild(styleSheet);
+
+/* ══════════════════════════════
+   SHOULDER SURFING
+══════════════════════════════ */
 function buildSSGrid(mode) {
   const grid = document.getElementById('ss-grid');
   grid.innerHTML = '';
@@ -503,11 +902,12 @@ function buildSSGrid(mode) {
     const ic = document.createElement('div');
     ic.className = 'ss-ic';
     ic.style.background = colors[i];
+    if (mode === 'good') ic.style.filter = 'blur(1.5px)';
     grid.appendChild(ic);
   }
   if (mode === 'bad') {
     const sf = document.createElement('div');
-    sf.style.cssText = 'margin-top:4px;font-size:6px;color:rgba(231,76,60,0.8);text-align:center;font-weight:700;grid-column:span 3';
+    sf.style.cssText = 'margin-top:5px;font-size:6.5px;color:rgba(231,76,60,0.9);text-align:center;font-weight:700;grid-column:span 3;background:rgba(231,76,60,0.1);border-radius:4px;padding:2px 0;';
     sf.textContent = '🔒 Secure Folder';
     grid.appendChild(sf);
   }
@@ -516,21 +916,88 @@ buildSSGrid('bad');
 
 function ssSwitch(mode) {
   buildSSGrid(mode);
-  const ring = document.getElementById('eye-ring');
-  const text = document.getElementById('eye-text');
-  const desc = document.getElementById('ss-desc');
+  const phone  = document.getElementById('ss-phone');
+  const eye    = document.getElementById('spy-eye');
+  const beam   = document.getElementById('scan-beam');
+  const label  = document.getElementById('spy-label');
+  const desc   = document.getElementById('ss-desc');
+  const pov    = document.getElementById('attacker-pov');
+
   document.getElementById('ss-btn-bad').classList.remove('active');
   document.getElementById('ss-btn-good').classList.remove('active');
+
   if (mode === 'bad') {
-    ring.className = 'eye-ring danger'; text.className = 'eye-text danger'; text.textContent = 'Visible';
-    desc.textContent = 'Classic Secure Folder: the observer clearly sees the icon and asks "what are you hiding?"';
+    phone.className   = 'ss-phone danger-mode';
+    eye.className     = 'spy-eye-outer danger';
+    beam.className    = 'scan-beam';
+    label.className   = 'spy-label danger';
+    label.textContent = 'TRACKING';
+    desc.innerHTML    = 'Classic Secure Folder: the observer <b style="color:#ff6b6b">clearly sees the icon</b> and grows suspicious. A single glance is enough to launch an attack.';
+    pov.className     = 'attacker-pov';
+    pov.innerHTML     = '👤 Observer: "There\'s a Secure Folder —<br>they\'re definitely hiding something!"';
     document.getElementById('ss-btn-bad').classList.add('active');
   } else {
-    ring.className = 'eye-ring safe'; text.className = 'eye-text safe'; text.textContent = 'Hidden';
-    desc.textContent = 'With SGBA: no trace on screen. The observer sees a normal home screen. They cannot know the hidden section even exists.';
+    phone.className   = 'ss-phone safe-mode';
+    eye.className     = 'spy-eye-outer safe';
+    beam.className    = 'scan-beam hidden';
+    label.className   = 'spy-label safe';
+    label.textContent = 'CANNOT SEE';
+    desc.innerHTML    = 'With SGBA: <b style="color:#00e5a0">zero trace on screen</b>. The observer sees a normal home screen — they have no idea a hidden space even exists.';
+    pov.className     = 'attacker-pov safe';
+    pov.innerHTML     = '👤 Observer: "Just a normal phone,<br>nothing interesting here."';
     document.getElementById('ss-btn-good').classList.add('active');
   }
 }
+
+/* ══════════════════════════════
+   PROXIMITY SENSOR ANIMATION
+══════════════════════════════ */
+(function proximityLoop() {
+  const finger   = document.getElementById('prox-finger');
+  const dot      = document.getElementById('prox-dot');
+  const statusEl = document.getElementById('prox-status');
+  let phase = 0;
+
+  function tick() {
+    if (phase === 0) {
+      finger.className      = 'finger near';
+      dot.style.background  = '#f9c74f';
+      dot.style.boxShadow   = '0 0 8px #f9c74f';
+      statusEl.textContent  = '⚠ Proximity detected…';
+      statusEl.style.color  = 'rgba(249,199,79,0.85)';
+      setTimeout(() => { phase = 1; tick(); }, 1200);
+    } else if (phase === 1) {
+      finger.className      = 'finger blocked';
+      dot.style.background  = 'var(--red)';
+      dot.style.boxShadow   = '0 0 8px var(--red)';
+      statusEl.textContent  = '🛑 Access blocked!';
+      statusEl.style.color  = 'rgba(255,80,80,0.85)';
+      setTimeout(() => { phase = 2; tick(); }, 1400);
+    } else {
+      finger.className      = 'finger far';
+      dot.style.background  = 'var(--green)';
+      dot.style.boxShadow   = '0 0 6px var(--green)';
+      statusEl.textContent  = '✓ Sensor active — standing by';
+      statusEl.style.color  = 'rgba(0,229,160,0.7)';
+      setTimeout(() => { phase = 0; tick(); }, 1800);
+    }
+  }
+  tick();
+})();
+
+/* ══════════════════════════════
+   FILTER BARS ANIMATE ON VISIBLE
+══════════════════════════════ */
+const filterObs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    setTimeout(() => {
+      document.getElementById('fi-speed').style.width = '85%';
+      document.getElementById('fi-prox').style.width  = '100%';
+    }, 200);
+    filterObs.disconnect();
+  }
+}, { threshold: 0.3 });
+filterObs.observe(document.getElementById('card-at'));
 </script>
 </body>
 </html>
