@@ -11,7 +11,7 @@
 
 👉 [Security Analysis TR](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_guvenlik_analizi.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/Writing_sgba_security_analysis_eng_html.html)
 
-👉 [v2 Use Cases TR](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_use_cases_eng.html)
+👉 [v3 Use Cases TR](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_use_cases_eng.html)
 
 # 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v2.9)
 
