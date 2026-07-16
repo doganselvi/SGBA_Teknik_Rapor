@@ -13,7 +13,7 @@
 
 👉 [v3 Use Cases TR](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_kullanim_senaryolari.html) | [EN](https://doganselvi.github.io/SGBA_Teknik_Rapor/sgba_use_cases_eng.html)
 
-# 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v2.9)
+# 🛡️ SGBA — Zero-Visual Trace Security Algorithm (v3.0)
 
 SGBA (Zero-Visual Trace Security Algorithm) is a next-generation, gesture-based and behavior-analysis-driven security approach that enables access to hidden layers on mobile devices **without leaving any visual trace**.
 
